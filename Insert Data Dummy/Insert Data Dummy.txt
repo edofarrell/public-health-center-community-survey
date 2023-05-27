@@ -1,0 +1,12 @@
+--Insert Role
+INSERT INTO [Role](namaRole)
+VALUES('Admin'),('Kader'),('Penanggung Jawab')
+
+--Insert User
+--Dearen = Admin
+--Edo = Kader
+--Neil = Penanggung Jawab
+INSERT INTO [User](username,[password],idRole)
+VALUES('dearen','password','1'),
+('edo','password','2'),
+('neil','password','3')
