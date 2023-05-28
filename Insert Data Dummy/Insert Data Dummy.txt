@@ -10,3 +10,13 @@ INSERT INTO [User](username,[password],idRole)
 VALUES('dearen','password','1'),
 ('edo','password','2'),
 ('neil','password','3')
+
+INSERT INTO Survei(namaSurvei,[timestamp],tombstone)
+VALUES('Covid19',CURRENT_TIMESTAMP,1)
+
+INSERT INTO PertanyaanSurvei(pertanyaan,[timestamp],tombstone,idSurvei)
+VALUES('Nama anda siapa?',CURRENT_TIMESTAMP,1,1),
+('Umur anda berapa?',CURRENT_TIMESTAMP,1,1),
+('Sudah vaksin kedua?',CURRENT_TIMESTAMP,1,1),
+('Vaksin terakhir tanggal berapa?',CURRENT_TIMESTAMP,1,1),
+('Pernah terjangkit Covid19?',CURRENT_TIMESTAMP,1,1)
