@@ -1,4 +1,4 @@
-CREATE PROCEDURE UbahSurvei
+ALTER PROCEDURE UbahSurvei
 	@idUser INT,
 	@idSurvei INT,
 	@idGroupJawaban INT,
@@ -80,3 +80,5 @@ AS
 			END
 		CLOSE cursorJawaban
 		DEALLOCATE cursorJawaban
+
+		EXEC InsertJawaban @idUser, @idUser, @strJawaban

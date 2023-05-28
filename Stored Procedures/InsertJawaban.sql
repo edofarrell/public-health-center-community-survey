@@ -1,3 +1,6 @@
+/*
+	Date : YYYY-MM-DD
+*/
 CREATE PROCEDURE InsertJawaban
 	@idUser INT,
 	@idSurvei INT,
