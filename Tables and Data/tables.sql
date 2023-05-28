@@ -1,3 +1,14 @@
+DROP TABLE 
+	[dbo].[Role],
+	[dbo].[User],
+	[dbo].[Survei],
+	[dbo].[MengaksesSurvei],
+	[dbo].[GroupJawaban],
+	[dbo].[PertanyaanSurvei],
+	[dbo].[JawabanDate],
+	[dbo].[JawabanNumeric],
+	[dbo].[JawabanString]
+
 CREATE TABLE [dbo].[Role]
 (
 	[idRole] [INT] PRIMARY KEY IDENTITY(1, 1) NOT NULL,

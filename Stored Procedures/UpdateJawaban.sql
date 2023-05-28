@@ -1,84 +1,103 @@
-ALTER PROCEDURE UbahSurvei
-	@idUser INT,
-	@idSurvei INT,
-	@idGroupJawaban INT,
-	@strJawaban VARCHAR(1000)
+/*
+	Format
+	Date: YYYY-MM-DD
+*/
+
+ALTER PROCEDURE [UpdateJawaban]
+	@idUser [INT],
+	@idSurvei [INT],
+	@idGroupJawaban [INT],
+	@strJawaban [VARCHAR](1000)
 AS
-	DECLARE @tblJawaban TABLE(
-		idPertanyaan INT,
-		JawabanPertanyaan VARCHAR(1000)
+	DECLARE @tabelJawaban TABLE
+	(
+		[idPertanyaan] [INT],
+		[jawaban] [VARCHAR](1000)
 	)
 
-	INSERT INTO @tblJawaban
-		SELECT
-			CAST([key] AS INT),
-			[value]
-		FROM
-			PARSE(@strJawaban)
+	INSERT INTO @tabelJawaban
+	SELECT
+		CAST([key] AS [INT]),
+		[value]
+	FROM
+		PARSE(@strJawaban)
 
 	DECLARE cursorJawaban CURSOR
-		FOR
-		SELECT
-			idPertanyaan,
-			JawabanPertanyaan
-		FROM
-			@tblJawaban
+	FOR
+		SELECT 
+			[idPertanyaan],
+			[jawaban]
+		FROM 
+			@tabelJawaban
 	OPEN cursorJawaban
-		DECLARE @idPertanyaan INT
-		DECLARE @ans VARCHAR(1000)
+
+	DECLARE 
+		@currIdPertanyaan [INT],
+		@currJawaban [VARCHAR](100)
+
+	FETCH NEXT FROM
+		cursorJawaban
+	INTO
+		@currIdPertanyaan,
+		@currJawaban
+
+	WHILE(@@FETCH_STATUS = 0)
+	BEGIN
+		IF(ISNUMERIC(@currJawaban) = 1)
+		BEGIN
+			UPDATE 
+				[JawabanNumeric]
+			SET
+				[tombstone] = 0
+			WHERE
+				[idGroupJawaban] = @idGroupJawaban
+				AND	[idPertanyaan] = @currIdPertanyaan
+				AND	[tombstone] = 1
+
+			INSERT INTO 
+				[JawabanNumeric]([jawabanNumeric], [timestamp], [tombstone], [idPertanyaan], [idUser], [idGroupJawaban])
+			VALUES
+				(@currJawaban, CURRENT_TIMESTAMP, 1, @currIdPertanyaan, @idUser, @idGroupJawaban)
+		END
+		ELSE IF(ISDATE(@currJawaban) = 1)
+		BEGIN
+			UPDATE 
+				[JawabanDate]
+			SET
+				[tombstone] = 0
+			WHERE
+				[idGroupJawaban] = @idGroupJawaban
+				AND	[idPertanyaan] = @currIdPertanyaan
+				AND	[tombstone] = 1
+
+			INSERT INTO 
+				[JawabanDate]([jawabanDate], [timestamp], [tombstone], [idPertanyaan], [idUser], [idGroupJawaban])
+			VALUES
+				(@currJawaban, CURRENT_TIMESTAMP, 1, @currIdPertanyaan, @idUser, @idGroupJawaban)
+		END
+		ELSE
+		BEGIN
+			UPDATE 
+				[JawabanString]
+			SET
+				[tombstone] = 0
+			WHERE
+				[idGroupJawaban] = @idGroupJawaban
+				AND	[idPertanyaan] = @currIdPertanyaan
+				AND	[tombstone] = 1
+
+			INSERT INTO 
+				[JawabanString]([jawabanString], [timestamp], [tombstone], [idPertanyaan], [idUser], [idGroupJawaban])
+			VALUES
+				(@currJawaban, CURRENT_TIMESTAMP, 1, @currIdPertanyaan, @idUser, @idGroupJawaban)
+		END
+
 		FETCH NEXT FROM
 			cursorJawaban
 		INTO
-			@idPertanyaan,
-			@ans
-		WHILE @@FETCH_STATUS = 0
-			BEGIN
-				IF ISDATE(@ans) = 1
-					BEGIN
-						UPDATE 
-							JawabanDate
-						SET
-							tombstone = 0
-						WHERE
-							idGroupJawaban = @idGroupJawaban
-							AND
-							idPertanyaan = @idPertanyaan
-							AND
-							tombstone = 1
-					END
-				ELSE IF ISNUMERIC(@ans) = 1
-					BEGIN
-						UPDATE 
-							JawabanNumeric
-						SET
-							tombstone = 0
-						WHERE
-							idGroupJawaban = @idGroupJawaban
-							AND
-							idPertanyaan = @idPertanyaan
-							AND
-							tombstone = 1
-					END
-				ELSE
-					BEGIN
-						UPDATE 
-							JawabanString
-						SET
-							tombstone = 0
-						WHERE
-							idGroupJawaban = @idGroupJawaban
-							AND
-							idPertanyaan = @idPertanyaan
-							AND
-							tombstone = 1
-					END
-				FETCH NEXT FROM 
-					cursorJawaban
-				INTO
-					@idPertanyaan,
-					@ans
-			END
-		CLOSE cursorJawaban
-		DEALLOCATE cursorJawaban
+			@currIdPertanyaan,
+			@currJawaban
+	END
 
-		EXEC InsertJawaban @idUser, @idUser, @strJawaban
+	CLOSE cursorJawaban
+	DEALLOCATE cursorJawaban

@@ -1,57 +1,83 @@
 /*
-	Date : YYYY-MM-DD
+	Format
+	Date: YYYY-MM-DD
 */
-CREATE PROCEDURE InsertJawaban
-	@idUser INT,
-	@idSurvei INT,
-	@jawabanJSON VARCHAR(1000)
+
+ALTER PROCEDURE [InsertJawaban]
+	@idUser [INT],
+	@idSurvei [INT],
+	@strJawaban [VARCHAR](1000)
 AS
+	DECLARE 
+		@currIdPertanyaan [INT],
+		@currJawaban [VARCHAR](100),
+		@idGroupJawaban [INT]
 
-DECLARE @tabelJawaban TABLE(
-	[key] INT,
-	[value] VARCHAR(100)
-)
-INSERT INTO @tabelJawaban
-SELECT
-	CAST([key] AS INT),
-	[value]
-FROM
-	PARSE(@jawabanJSON)
+	INSERT INTO 
+		[GroupJawaban]([timestamp], [idSurvei])
+	VALUES
+		(CURRENT_TIMESTAMP, @idSurvei)
+	SET 
+		@idGroupJawaban = @@IDENTITY
 
-DECLARE curJawaban CURSOR
-FOR
-SELECT [key],[value] FROM @tabelJawaban
+	DECLARE @tabelJawaban TABLE
+	(
+		[idPertanyaan] [INT],
+		[jawaban] [VARCHAR](1000)
+	)
 
-DECLARE @idPertanyaan INT
-DECLARE @jawabanTemp VARCHAR(100)
-DECLARE @indexGroupJawaban INT
+	INSERT INTO @tabelJawaban
+	SELECT
+		CAST([key] AS [INT]),
+		[value]
+	FROM
+		PARSE(@strJawaban)
 
-INSERT INTO GroupJawaban([timestamp],idSurvei)
-VALUES(CURRENT_TIMESTAMP,@idSurvei)
-SET @indexGroupJawaban = @@IDENTITY
+	DECLARE cursorJawaban CURSOR
+	FOR
+		SELECT 
+			[idPertanyaan],
+			[jawaban]
+		FROM 
+			@tabelJawaban
+	OPEN cursorJawaban
 
-OPEN curJawaban
+	FETCH NEXT FROM 
+		cursorJawaban 
+	INTO 
+		@currIdPertanyaan,
+		@currJawaban
 
-FETCH NEXT FROM curJawaban INTO @idPertanyaan,@jawabanTemp
-WHILE(@@FETCH_STATUS=0)
-BEGIN
-	IF(ISNUMERIC(@jawabanTemp)=1)
+	WHILE(@@FETCH_STATUS = 0)
 	BEGIN
-		INSERT INTO [JawabanNumeric](jawabanNumeric,[timestamp],tombstone,idPertanyaan,idUser,idGroupJawaban)
-		VALUES(@jawabanTemp,CURRENT_TIMESTAMP,1,@idPertanyaan,@idUser,@indexGroupJawaban)
-	END
-	ELSE IF(ISDATE(@jawabanTemp)=1)
-	BEGIN
-		INSERT INTO [JawabanDate](jawabanDate,[timestamp],tombstone,idPertanyaan,idUser,idGroupJawaban)
-		VALUES(@jawabanTemp,CURRENT_TIMESTAMP,1,@idPertanyaan,@idUser,@indexGroupJawaban)
-	END
-	ELSE
-	BEGIN
-		INSERT INTO [JawabanString](jawabanString,[timestamp],tombstone,idPertanyaan,idUser,idGroupJawaban)
-		VALUES(@jawabanTemp,CURRENT_TIMESTAMP,1,@idPertanyaan,@idUser,@indexGroupJawaban)
-	END
-	FETCH NEXT FROM curJawaban INTO @idPertanyaan,@jawabanTemp
-END
+		IF(ISNUMERIC(@currJawaban) = 1)
+		BEGIN
+			INSERT INTO 
+				[JawabanNumeric]([jawabanNumeric], [timestamp], [tombstone], [idPertanyaan], [idUser], [idGroupJawaban])
+			VALUES
+				(@currJawaban, CURRENT_TIMESTAMP, 1, @currIdPertanyaan, @idUser, @idGroupJawaban)
+		END
+		ELSE IF(ISDATE(@currJawaban) = 1)
+		BEGIN
+			INSERT INTO 
+				[JawabanDate]([jawabanDate], [timestamp], [tombstone], [idPertanyaan], [idUser], [idGroupJawaban])
+			VALUES
+				(@currJawaban, CURRENT_TIMESTAMP, 1, @currIdPertanyaan, @idUser, @idGroupJawaban)
+		END
+		ELSE
+		BEGIN
+			INSERT INTO 
+				[JawabanString]([jawabanString], [timestamp], [tombstone], [idPertanyaan], [idUser], [idGroupJawaban])
+			VALUES
+				(@currJawaban, CURRENT_TIMESTAMP, 1, @currIdPertanyaan, @idUser, @idGroupJawaban)
+		END
 
-CLOSE curJawaban
-DEALLOCATE curJawaban
+		FETCH NEXT FROM 
+			cursorJawaban 
+		INTO 
+			@currIdPertanyaan,
+			@currJawaban
+	END
+
+	CLOSE cursorJawaban
+	DEALLOCATE cursorJawaban
