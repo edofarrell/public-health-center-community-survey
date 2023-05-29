@@ -1,8 +1,5 @@
-ALTER PROCEDURE [MengambilJawaban]
-	@idUser [INT],
-	@idGroupJawaban [INT],
-	@waktuAwal [DATETIME],
-	@waktuAkhir [DATETIME]
+ALTER PROCEDURE [AmbilJawaban]
+	@idGroupJawaban [INT]
 AS
 	DECLARE @result TABLE
 	(
@@ -17,10 +14,7 @@ AS
 	FROM
 		[JawabanNumeric]
 	WHERE
-		[idUser] = @idUser
-		AND [idGroupJawaban] = @idGroupJawaban
-		AND [timestamp] >= @waktuAwal
-		AND [timestamp] <= @waktuAkhir
+		[idGroupJawaban] = @idGroupJawaban
 		AND	[tombstone] = 1
 
 	INSERT INTO @result
@@ -30,10 +24,7 @@ AS
 	FROM
 		[JawabanDate]
 	WHERE
-		[idUser] = @idUser
-		AND [idGroupJawaban] = @idGroupJawaban
-		AND [timestamp] >= @waktuAwal
-		AND [timestamp] <= @waktuAkhir
+		[idGroupJawaban] = @idGroupJawaban
 		AND	[tombstone] = 1
 
 	INSERT INTO @result
@@ -43,10 +34,7 @@ AS
 	FROM
 		[JawabanString]
 	WHERE
-		[idUser] = @idUser
-		AND [idGroupJawaban] = @idGroupJawaban
-		AND [timestamp] >= @waktuAwal
-		AND [timestamp] <= @waktuAkhir
+		[idGroupJawaban] = @idGroupJawaban
 		AND	[tombstone] = 1
 
 	SELECT
