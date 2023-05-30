@@ -11,3 +11,5 @@ AS
 	WHERE
 		[MengaksesSurvei].[idUser] = @idUser
 		AND	[Survei].[tombstone] = 1
+	ORDER BY
+		[Survei].[idSurvei] ASC

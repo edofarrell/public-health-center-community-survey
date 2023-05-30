@@ -12,3 +12,5 @@ AS
 		[idSurvei] = @idSurvei
 		AND [timestamp] >= @waktuAwal
 		AND [timestamp] <= @waktuAkhir
+	ORDER BY
+		[idGroupJawaban] ASC
