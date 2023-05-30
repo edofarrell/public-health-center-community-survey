@@ -42,3 +42,5 @@ AS
 		[jawaban]
 	FROM
 		@result
+	ORDER BY
+		[idPertanyaan] ASC
