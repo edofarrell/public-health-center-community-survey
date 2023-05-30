@@ -5,7 +5,6 @@
 
 ALTER PROCEDURE [UpdateJawaban]
 	@idUser [INT],
-	@idSurvei [INT],
 	@idGroupJawaban [INT],
 	@strJawaban [VARCHAR](1000)
 AS
