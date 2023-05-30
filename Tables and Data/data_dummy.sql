@@ -1,8 +1,9 @@
---Insert Role
 INSERT INTO
 	[Role]([namaRole])
 VALUES
-	('Admin'), ('Kader'), ('Penanggung Jawab')
+	('Admin'),
+	('Kader'),
+	('Penanggung Jawab')
 
 --Insert User
 --Dearen = Admin
@@ -15,13 +16,20 @@ VALUES
 	('edo', 'password', '2'),
 	('neil', 'password', '3')
 
---Insert Survei Baru Covid19
 INSERT INTO
-	Survei([namaSurvei], [timestamp], [tombstone])
+	[Survei]([namaSurvei], [timestamp], [tombstone])
 VALUES
-	('Covid19', CURRENT_TIMESTAMP, 1)
+	('Covid19', CURRENT_TIMESTAMP, 1),
+	('Demam Berdarah', CURRENT_TIMESTAMP, 1),
+	('Diare', CURRENT_TIMESTAMP, 1)
 
---Insert Pertanyaan ke Survei Covid19
+INSERT INTO
+	[MengaksesSurvei]([idUser], [idSurvei])
+VALUES
+	(2, 1),
+	(2, 2),
+	(2, 3)
+
 INSERT INTO
 	PertanyaanSurvei([pertanyaan], [timestamp], [tombstone], [idSurvei])
 VALUES
@@ -29,34 +37,12 @@ VALUES
 	('Umur anda berapa?', CURRENT_TIMESTAMP, 1, 1),
 	('Sudah vaksin kedua?', CURRENT_TIMESTAMP, 1, 1),
 	('Vaksin terakhir tanggal berapa?', CURRENT_TIMESTAMP, 1, 1),
-	('Pernah terjangkit Covid19?', CURRENT_TIMESTAMP, 1, 1)
-
---Insert Survei Baru Demam Berdarah
-INSERT INTO
-	Survei([namaSurvei], [timestamp], [tombstone])
-VALUES
-	('Demam Berdarah', CURRENT_TIMESTAMP, 1)
-
---Insert pertanyaan ke survei Demam Berdarah
-INSERT INTO
-	PertanyaanSurvei([pertanyaan], [timestamp], [tombstone], [idSurvei])
-VALUES
+	('Pernah terjangkit Covid19?', CURRENT_TIMESTAMP, 1, 1),
 	('Nama anda siapa?', CURRENT_TIMESTAMP, 1, 2),
 	('Umur anda berapa?', CURRENT_TIMESTAMP, 1, 2),
 	('Kapan terakhir mengalami demam berdarah?', CURRENT_TIMESTAMP, 1, 2),
 	('Apakah lingkungan tempat tinggal anda banyak nyamuk?', CURRENT_TIMESTAMP, 1, 2),
-	('Sudah berapa kali anda terkena demam berdarah?', CURRENT_TIMESTAMP, 1, 2)
-
---Insert survei baru Diare
-INSERT INTO
-	Survei([namaSurvei], [timestamp], [tombstone])
-VALUES
-	('Diare', CURRENT_TIMESTAMP, 1)
-
---Insert pertanyaan ke survei Diare
-INSERT INTO
-	PertanyaanSurvei([pertanyaan], [timestamp], [tombstone], [idSurvei])
-VALUES
+	('Sudah berapa kali anda terkena demam berdarah?', CURRENT_TIMESTAMP, 1, 2),
 	('Nama anda siapa?', CURRENT_TIMESTAMP, 1, 3),
 	('Umur anda berapa?', CURRENT_TIMESTAMP, 1, 3),
 	('Kapan terakhir mengalami diare?', CURRENT_TIMESTAMP, 1, 3),
