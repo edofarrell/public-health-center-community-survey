@@ -11,6 +11,7 @@ AS
 	DECLARE 
 		@currIdPertanyaan [INT],
 		@currJawaban [VARCHAR](100),
+		@currTipeJawaban [VARCHAR](10),
 		@idGroupJawaban [INT]
 
 	INSERT INTO 
@@ -36,28 +37,32 @@ AS
 	DECLARE cursorJawaban CURSOR
 	FOR
 		SELECT 
-			[idPertanyaan],
-			[jawaban]
+			[@tabelJawaban].[idPertanyaan],
+			[@tabelJawaban].[jawaban],
+			[PertanyaanSurvei].[tipeJawaban]
 		FROM 
 			@tabelJawaban
+			INNER JOIN [PertanyaanSurvei]
+				ON [@tabelJawaban].[idPertanyaan] = [PertanyaanSurvei].idPertanyaan
 	OPEN cursorJawaban
 
 	FETCH NEXT FROM 
 		cursorJawaban 
 	INTO 
 		@currIdPertanyaan,
-		@currJawaban
+		@currJawaban,
+		@currTipeJawaban
 
 	WHILE(@@FETCH_STATUS = 0)
 	BEGIN
-		IF(ISNUMERIC(@currJawaban) = 1)
+		IF(@currTipeJawaban = 'NUMERIC')
 		BEGIN
 			INSERT INTO 
 				[JawabanNumeric]([jawabanNumeric], [timestamp], [tombstone], [idPertanyaan], [idUser], [idGroupJawaban])
 			VALUES
 				(@currJawaban, CURRENT_TIMESTAMP, 1, @currIdPertanyaan, @idUser, @idGroupJawaban)
 		END
-		ELSE IF(ISDATE(@currJawaban) = 1)
+		ELSE IF(@currTipeJawaban = 'DATE')
 		BEGIN
 			INSERT INTO 
 				[JawabanDate]([jawabanDate], [timestamp], [tombstone], [idPertanyaan], [idUser], [idGroupJawaban])
@@ -76,7 +81,8 @@ AS
 			cursorJawaban 
 		INTO 
 			@currIdPertanyaan,
-			@currJawaban
+			@currJawaban,
+			@currTipeJawaban
 	END
 
 	CLOSE cursorJawaban
