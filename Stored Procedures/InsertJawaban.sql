@@ -43,7 +43,7 @@ AS
 		FROM 
 			@tabelJawaban
 			INNER JOIN [PertanyaanSurvei]
-				ON [@tabelJawaban].[idPertanyaan] = [PertanyaanSurvei].idPertanyaan
+				ON [@tabelJawaban].[idPertanyaan] = [PertanyaanSurvei].[idPertanyaanSurvei]
 	OPEN cursorJawaban
 
 	FETCH NEXT FROM 
