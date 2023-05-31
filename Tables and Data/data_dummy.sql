@@ -31,22 +31,22 @@ VALUES
 	(2, 3)
 
 INSERT INTO
-	[PertanyaanSurvei]([pertanyaan], [timestamp], [tombstone], [idSurvei])
+	[PertanyaanSurvei]([pertanyaan], [tipeJawaban], [timestamp], [tombstone], [idSurvei])
 VALUES
-	('Nama anda siapa?', CURRENT_TIMESTAMP, 1, 1),
-	('Umur anda berapa?', CURRENT_TIMESTAMP, 1, 1),
-	('Sudah vaksin kedua?', CURRENT_TIMESTAMP, 1, 1),
-	('Vaksin terakhir tanggal berapa?', CURRENT_TIMESTAMP, 1, 1),
-	('Pernah terjangkit Covid19?', CURRENT_TIMESTAMP, 1, 1),
+	('Nama anda siapa?', 'STRING', CURRENT_TIMESTAMP, 1, 1),
+	('Umur anda berapa?', 'NUMERIC', CURRENT_TIMESTAMP, 1, 1),
+	('Sudah vaksin kedua?', 'STRING', CURRENT_TIMESTAMP, 1, 1),
+	('Vaksin terakhir tanggal berapa?', 'DATE', CURRENT_TIMESTAMP, 1, 1),
+	('Pernah terjangkit Covid19?', 'STRING', CURRENT_TIMESTAMP, 1, 1),
 
-	('Nama anda siapa?', CURRENT_TIMESTAMP, 1, 2),
-	('Umur anda berapa?', CURRENT_TIMESTAMP, 1, 2),
-	('Kapan terakhir mengalami demam berdarah?', CURRENT_TIMESTAMP, 1, 2),
-	('Apakah lingkungan tempat tinggal anda banyak nyamuk?', CURRENT_TIMESTAMP, 1, 2),
-	('Sudah berapa kali anda terkena demam berdarah?', CURRENT_TIMESTAMP, 1, 2),
+	('Nama anda siapa?', 'STRING', CURRENT_TIMESTAMP, 1, 2),
+	('Umur anda berapa?', 'NUMERIC', CURRENT_TIMESTAMP, 1, 2),
+	('Kapan terakhir mengalami demam berdarah?', 'DATE', CURRENT_TIMESTAMP, 1, 2),
+	('Apakah lingkungan tempat tinggal anda banyak nyamuk?', 'STRING', CURRENT_TIMESTAMP, 1, 2),
+	('Sudah berapa kali anda terkena demam berdarah?', 'NUMERIC', CURRENT_TIMESTAMP, 1, 2),
 
-	('Nama anda siapa?', CURRENT_TIMESTAMP, 1, 3),
-	('Umur anda berapa?', CURRENT_TIMESTAMP, 1, 3),
-	('Kapan terakhir mengalami diare?', CURRENT_TIMESTAMP, 1, 3),
-	('Apakah anda sering membeli makanan di luar?', CURRENT_TIMESTAMP, 1, 3),
-	('Apakah anda memiliki riwayat penyakit perut?', CURRENT_TIMESTAMP, 1, 3)
+	('Nama anda siapa?', 'STRING', CURRENT_TIMESTAMP, 1, 3),
+	('Umur anda berapa?', 'NUMERIC', CURRENT_TIMESTAMP, 1, 3),
+	('Kapan terakhir mengalami diare?', 'DATE', CURRENT_TIMESTAMP, 1, 3),
+	('Apakah anda sering membeli makanan di luar?', 'STRING', CURRENT_TIMESTAMP, 1, 3),
+	('Apakah anda memiliki riwayat penyakit perut?', 'STRING', CURRENT_TIMESTAMP, 1, 3)
