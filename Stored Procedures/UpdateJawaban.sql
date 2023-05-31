@@ -27,22 +27,26 @@ AS
 			[idPertanyaan],
 			[jawaban]
 		FROM 
-			@tabelJawaban
+			[@tabelJawaban]
+			INNER JOIN [PertanyaanSurvei]
+				ON [@tabelJawaban].[idPertanyaan] = [PertanyaanSurvei].[idPertanyaanSurvei]
 	OPEN cursorJawaban
 
 	DECLARE 
 		@currIdPertanyaan [INT],
-		@currJawaban [VARCHAR](100)
+		@currJawaban [VARCHAR](100),
+		@currTipeJawaban [VARCHAR](10)
 
 	FETCH NEXT FROM
 		cursorJawaban
 	INTO
 		@currIdPertanyaan,
-		@currJawaban
+		@currJawaban,
+		@currTipeJawaban
 
 	WHILE(@@FETCH_STATUS = 0)
 	BEGIN
-		IF(ISNUMERIC(@currJawaban) = 1)
+		IF(@currTipeJawaban = 'NUMERIC')
 		BEGIN
 			UPDATE 
 				[JawabanNumeric]
@@ -58,7 +62,7 @@ AS
 			VALUES
 				(@currJawaban, CURRENT_TIMESTAMP, 1, @currIdPertanyaan, @idUser, @idGroupJawaban)
 		END
-		ELSE IF(ISDATE(@currJawaban) = 1)
+		ELSE IF(@currTipeJawaban = 'DATE')
 		BEGIN
 			UPDATE 
 				[JawabanDate]
@@ -95,7 +99,8 @@ AS
 			cursorJawaban
 		INTO
 			@currIdPertanyaan,
-			@currJawaban
+			@currJawaban,
+			@currTipeJawaban
 	END
 
 	CLOSE cursorJawaban
