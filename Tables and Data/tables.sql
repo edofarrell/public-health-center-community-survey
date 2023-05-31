@@ -45,10 +45,15 @@ CREATE TABLE [dbo].[GroupJawaban]
 	[idSurvei] [INT] NOT NULL --FK [Survei]([idSurvei])
 )
 
+/*
+	Tipe Jawaban:
+	'NUMERIC', 'DATE', 'STRING'
+*/
 CREATE TABLE [dbo].[PertanyaanSurvei]
 (
 	[idPertanyaanSurvei] [INT] PRIMARY KEY IDENTITY(1,1) NOT NULL,
 	[pertanyaan] [VARCHAR](100) NOT NULL,
+	[tipeJawaban] [VARCHAR](10) NOT NULL,
 	[timestamp] [DATETIME] NOT NULL,
 	[tombstone] [BIT] NOT NULL,
 	[idSurvei] [INT] NOT NULL --FK [Survei]([idSurvei])
