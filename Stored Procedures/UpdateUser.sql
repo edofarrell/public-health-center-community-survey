@@ -1,4 +1,4 @@
-ALTER PROCEDURE [EditUser]
+CREATE PROCEDURE [UpdateUser]
 	@newUsername [VARCHAR](50),
 	@newPassword [VARCHAR](50),
 	@idUser [INT]
