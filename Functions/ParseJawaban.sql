@@ -1,5 +1,5 @@
 /* 
-	String Format: "key1:value1,key2:value2,...,keyn:valuen"
+	String Format: "id1:jawaban1,id2:jawaban2,...,idn:jawabann"
 	First seperator: ','
 	Second seperator: ':'
 */
