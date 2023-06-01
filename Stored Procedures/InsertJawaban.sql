@@ -32,7 +32,7 @@ AS
 		CAST([key] AS [INT]),
 		[value]
 	FROM
-		PARSE(@strJawaban)
+		ParseJawaban(@strJawaban)
 
 	DECLARE cursorJawaban CURSOR
 	FOR

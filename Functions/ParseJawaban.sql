@@ -4,7 +4,7 @@
 	Second seperator: ':'
 */
 
-ALTER FUNCTION [Parse] 
+ALTER FUNCTION [ParseJawaban] 
 (
 	@str [VARCHAR](1000)
 )
