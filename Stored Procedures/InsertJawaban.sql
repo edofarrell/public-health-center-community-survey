@@ -41,7 +41,7 @@ AS
 			[@tabelJawaban].[jawaban],
 			[PertanyaanSurvei].[tipeJawaban]
 		FROM 
-			[@tabelJawaban]
+			@tabelJawaban
 			INNER JOIN [PertanyaanSurvei]
 				ON [@tabelJawaban].[idPertanyaan] = [PertanyaanSurvei].[idPertanyaanSurvei]
 	OPEN cursorJawaban
