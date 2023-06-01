@@ -24,8 +24,9 @@ AS
 	DECLARE cursorJawaban CURSOR
 	FOR
 		SELECT 
-			[idPertanyaan],
-			[jawaban]
+			[@tabelJawaban].[idPertanyaan],
+			[@tabelJawaban].[jawaban],
+			[PertanyaanSurvei].[tipeJawaban]
 		FROM 
 			@tabelJawaban
 			INNER JOIN [PertanyaanSurvei]
