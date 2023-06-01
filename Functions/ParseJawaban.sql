@@ -10,8 +10,8 @@ ALTER FUNCTION [ParseJawaban]
 )
 RETURNS @result TABLE
 (
-	[key] [VARCHAR](150),
-	[value] [VARCHAR](150)
+	[idPertanyaan] [INT],
+	[jawaban] [VARCHAR](150)
 )
 AS
 BEGIN

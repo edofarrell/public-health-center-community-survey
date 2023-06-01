@@ -16,8 +16,8 @@ AS
 
 	INSERT INTO @tabelJawaban
 	SELECT
-		CAST([key] AS [INT]),
-		[value]
+		[idPertanyaan],
+		[jawaban]
 	FROM
 		ParseJawaban(@strJawaban)
 
