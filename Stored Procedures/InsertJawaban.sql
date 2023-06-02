@@ -6,7 +6,7 @@
 ALTER PROCEDURE [InsertJawaban]
 	@idUser [INT],
 	@idSurvei [INT],
-	@jsonJawaban [NVARCHAR](3100)
+	@jsonJawaban [NVARCHAR](3350)
 AS
 	DECLARE 
 		@currIdPertanyaan [INT],
