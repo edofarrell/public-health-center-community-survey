@@ -3,6 +3,9 @@ ALTER PROCEDURE [UpdateUser]
 	@newPassword [VARCHAR](20),
 	@idUser [INT]
 AS
+	DECLARE
+		@isSuccess [BIT]
+
 	UPDATE 
 		[User]
 	SET
@@ -10,3 +13,9 @@ AS
 		[password] = @newPassword
 	WHERE
 		[idUser] = @idUser
+
+	SET
+		@isSuccess = 1
+
+	SELECT
+		@isSuccess
