@@ -1,5 +1,5 @@
 /*
-	Input Format:
+	Input Format (JSON):
 	{
 	 "namaSurvei": [STRING],
 	 "pertanyaan": 
@@ -20,7 +20,7 @@
 	Output Format:
 	key				value
 	namaSurvei		[VARCHAR](15)
-	pertanyaan		[NVARCHAR](1000), JSON Array
+	pertanyaan		[NVARCHAR](1000) (JSON Array)
 */
 
 ALTER FUNCTION [ParseSurvei]
