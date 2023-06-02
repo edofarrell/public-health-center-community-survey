@@ -1,26 +1,24 @@
 ALTER PROCEDURE [Login]
-	@username VARCHAR(50),
-	@password VARCHAR(50)
+	@username [VARCHAR](20),
+	@password [VARCHAR](20)
 AS
 	DECLARE 
-		@user VARCHAR(50), 
-		@pass VARCHAR(50),
-		@status BIT
+		@passDB [VARCHAR](20),
+		@isSuccess [BIT]
 
 	SET 
-		@status = 0
+		@isSuccess = 0
 
 	SELECT
-		@user = [username],
-		@pass = [password]
+		@passDB = [password]
 	FROM
 		[User]
 	WHERE
-		[username]=@username AND [password]=@password
+		[username] = @username
 
-	IF(@user IS NOT NULL AND @pass IS NOT NULL)
+	IF(@password = @passDB)
 	BEGIN
-		SET @status = 1
+		SET @isSuccess = 1
 	END
 
-	SELECT @status
+	SELECT @isSuccess
