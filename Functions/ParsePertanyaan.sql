@@ -1,4 +1,4 @@
-/* 
+ /* 
 	Input Format (JSON Array):
 	[
 		{
@@ -22,7 +22,7 @@
 
 ALTER FUNCTION [ParsePertanyaan] 
 (
-	@str [NVARCHAR](1000)
+	@json [NVARCHAR](2150)
 )
 RETURNS @result TABLE
 (
@@ -33,14 +33,14 @@ RETURNS @result TABLE
 AS
 BEGIN
 	DECLARE
-		@currPertanyaan [VARCHAR](200)
+		@currPertanyaan [VARCHAR](150)
 
 	DECLARE cursorPertanyaan CURSOR
 	FOR
 		SELECT
 			[value]
 		FROM
-			OPENJSON(@str)
+			OPENJSON(@json)
 	OPEN cursorPertanyaan
 
 	FETCH NEXT FROM
@@ -83,7 +83,7 @@ END
 */
 /*ALTER FUNCTION [ParsePertanyaan] 
 (
-	@str [VARCHAR](1000)
+	@json [VARCHAR](1000)
 )
 RETURNS @result TABLE
 (
@@ -98,7 +98,7 @@ BEGIN
 		SELECT 
 			value
 		FROM
-			STRING_SPLIT(@str, ',')
+			STRING_SPLIT(@json, ',')
 	OPEN cursorRow
 
 	DECLARE @currRow varchar(150)

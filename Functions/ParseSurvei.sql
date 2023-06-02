@@ -19,18 +19,18 @@
 
 	Output Format:
 	key				value
-	namaSurvei		[VARCHAR](15)
-	pertanyaan		[NVARCHAR](1000) (JSON Array)
+	namaSurvei		[VARCHAR](50)
+	pertanyaan		[NVARCHAR](2150) (JSON Array)
 */
 
 ALTER FUNCTION [ParseSurvei]
 (
-	@str [NVARCHAR](2048)
+	@json [NVARCHAR](2250)
 )
 RETURNS @result TABLE
 (
-	[key] [VARCHAR](15),
-	[value] [NVARCHAR](1000)
+	[key] [VARCHAR](10),
+	[value] [NVARCHAR](2150)
 )
 AS
 BEGIN
@@ -39,7 +39,7 @@ BEGIN
 		[key],
 		[value]
 	FROM
-		OPENJSON(@str)
+		OPENJSON(@json)
 
 	RETURN
 END

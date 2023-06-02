@@ -14,29 +14,29 @@
 	Output Format:
 	key				value
 	idPertanyaan	[INT]
-	jawaban			[VARCHAR](150)
+	jawaban			[VARCHAR](300)
 */
 
 ALTER FUNCTION [ParseJawaban] 
 (
-	@str [NVARCHAR](1000)
+	@json [NVARCHAR](3350)
 )
 RETURNS @result TABLE
 (
 	[idPertanyaan] [INT],
-	[jawaban] [VARCHAR](150)
+	[jawaban] [VARCHAR](300)
 )
 AS
 BEGIN
 	DECLARE 
-		@currJawaban [VARCHAR](150)
+		@currJawaban [VARCHAR](300)
 
 	DECLARE cursorJawaban CURSOR
 	FOR
 		SELECT 
 			[value]
 		FROM
-			OPENJSON(@str)
+			OPENJSON(@json)
 	OPEN cursorJawaban
 
 	FETCH NEXT FROM
@@ -78,7 +78,7 @@ END
 
 /*ALTER FUNCTION [ParseJawaban] 
 (
-	@str [VARCHAR](1000)
+	@json [VARCHAR](1000)
 )
 RETURNS @result TABLE
 (
@@ -92,7 +92,7 @@ BEGIN
 		SELECT 
 			value
 		FROM
-			STRING_SPLIT(@str, ',')
+			STRING_SPLIT(@json, ',')
 	OPEN cursorRow
 
 	DECLARE @currRow varchar(150)
