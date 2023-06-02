@@ -18,9 +18,9 @@
 	}
 
 	Output Format:
-	key				value
-	namaSurvei		[VARCHAR](50)
-	pertanyaan		[NVARCHAR](2150) (JSON Array)
+	namaSurvei			pertanyaan
+	[VARCHAR](50)		[NVARCHAR](2150) (JSON Array)
+			
 */
 
 ALTER FUNCTION [ParseSurvei]
@@ -29,17 +29,22 @@ ALTER FUNCTION [ParseSurvei]
 )
 RETURNS @result TABLE
 (
-	[key] [VARCHAR](10),
-	[value] [NVARCHAR](2150)
+	[namaSurvei] [VARCHAR](50),
+	[pertanyaan] [NVARCHAR](2150)
 )
 AS
 BEGIN
 	INSERT INTO @result
 	SELECT
-		[key],
-		[value]
+		[namaSurvei],
+		[pertanyaan]
 	FROM
 		OPENJSON(@json)
+	WITH
+		(
+			[namaSurvei] [VARCHAR](50) '$.namaSurvei',
+			[pertanyaan] [NVARCHAR](MAX) AS JSON
+		)
 
 	RETURN
 END
