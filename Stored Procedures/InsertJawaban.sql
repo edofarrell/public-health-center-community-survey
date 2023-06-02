@@ -12,14 +12,18 @@ AS
 		@currIdPertanyaan [INT],
 		@currJawaban [VARCHAR](300),
 		@currTipeJawaban [VARCHAR](10),
-		@idGroupJawaban [INT]
+		@idGroupJawaban [INT],
+		@isSuccess [BIT]
 
 	INSERT INTO 
 		[GroupJawaban]([timestamp], [idSurvei])
 	VALUES
 		(CURRENT_TIMESTAMP, @idSurvei)
+
 	SET 
 		@idGroupJawaban = @@IDENTITY
+	SET
+		@isSuccess = 1
 
 	DECLARE @tabelJawaban TABLE
 	(
@@ -87,3 +91,6 @@ AS
 
 	CLOSE cursorJawaban
 	DEALLOCATE cursorJawaban
+
+	SELECT
+		@isSuccess
