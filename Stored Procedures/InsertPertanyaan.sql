@@ -17,7 +17,8 @@ AS
 
 	DECLARE 
 		@currPertanyaan [VARCHAR](150),
-		@currTipeJawaban [VARCHAR](10)
+		@currTipeJawaban [VARCHAR](10),
+		@isSuccess [BIT]
 
 	DECLARE cursorPertanyaan CURSOR
 	FOR
@@ -50,3 +51,9 @@ AS
 
 	CLOSE cursorPertanyaan
 	DEALLOCATE cursorPertanyaan
+
+	SET
+		@isSuccess = 1
+
+	SELECT
+		@isSuccess
