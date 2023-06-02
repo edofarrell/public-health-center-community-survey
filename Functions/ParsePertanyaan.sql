@@ -19,6 +19,7 @@
 	pertanyaan		[VARCHAR](150)
 	tipeJawaban		[VARCHAR](10)
 */
+
 ALTER FUNCTION [ParsePertanyaan] 
 (
 	@str [NVARCHAR](1000)
