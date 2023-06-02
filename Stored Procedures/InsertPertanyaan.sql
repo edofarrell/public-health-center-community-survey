@@ -1,50 +1,52 @@
-ALTER PROCEDURE InsertPertanyaan
-	@idSurvei INT,
-	@pertanyaan VARCHAR(500)
+ALTER PROCEDURE [InsertPertanyaan]
+	@idSurvei [INT],
+	@jsonPertanyaan [NVARCHAR](2150)
 AS
+	DECLARE @tabelPertanyaan TABLE
+	(
+		[pertanyaan] [VARCHAR](150),
+		[tipeJawaban] [VARCHAR](10)
+	)
 
-DECLARE @tabelPertanyaan TABLE(
-	idPertanyaan INT,
-	pertanyaan VARCHAR(100),
-	tipeJawaban VARCHAR(10)
-)
-INSERT INTO @tabelPertanyaan
-SELECT
-	*
-FROM
-	ParsePertanyaan(@pertanyaan)
-
-DECLARE @currIdPertanyaan INT
-DECLARE @currPertanyaan VARCHAR(100)
-DECLARE @currTipeJawaban VARCHAR(10)
-
-DECLARE cursorPertanyaan CURSOR
-FOR
+	INSERT INTO @tabelPertanyaan
 	SELECT
-		idPertanyaan,
-		pertanyaan,
-		tipeJawaban
+		[pertanyaan],
+		[tipeJawaban]
 	FROM
-		@tabelPertanyaan
-OPEN cursorPertanyaan
+		ParsePertanyaan(@jsonPertanyaan)
 
-FETCH NEXT FROM cursorPertanyaan
-INTO
-	@currIdPertanyaan,
-	@currPertanyaan,
-	@currTipeJawaban
+	DECLARE 
+		@currPertanyaan [VARCHAR](150),
+		@currTipeJawaban [VARCHAR](10)
 
-WHILE(@@FETCH_STATUS=0)
-BEGIN
-	INSERT INTO [PertanyaanSurvei](pertanyaan,tipeJawaban,[timestamp],tombstone,idSurvei)
-	VALUES(@currPertanyaan,@currTipeJawaban,CURRENT_TIMESTAMP,1,@idSurvei)
+	DECLARE cursorPertanyaan CURSOR
+	FOR
+		SELECT
+			[pertanyaan],
+			[tipeJawaban]
+		FROM
+			@tabelPertanyaan
+	OPEN cursorPertanyaan
 
-	FETCH NEXT FROM cursorPertanyaan
+	FETCH NEXT FROM 
+		cursorPertanyaan
 	INTO
-		@currIdPertanyaan,
 		@currPertanyaan,
 		@currTipeJawaban
-END
 
-CLOSE cursorPertanyaan
-DEALLOCATE cursorPertanyaan
+	WHILE(@@FETCH_STATUS = 0)
+	BEGIN
+		INSERT INTO 
+			[PertanyaanSurvei]([pertanyaan], [tipeJawaban], [timestamp], [tombstone], [idSurvei])
+		VALUES
+			(@currPertanyaan, @currTipeJawaban, CURRENT_TIMESTAMP, 1, @idSurvei)
+
+		FETCH NEXT FROM 
+			cursorPertanyaan
+		INTO
+			@currPertanyaan,
+			@currTipeJawaban
+	END
+
+	CLOSE cursorPertanyaan
+	DEALLOCATE cursorPertanyaan
