@@ -12,9 +12,8 @@
 	]
 
 	Output Format:
-	key				value
-	idPertanyaan	[INT]
-	jawaban			[VARCHAR](300)
+	idPertanyaan	jawaban
+	[INT]			[VARCHAR](300)
 */
 
 ALTER FUNCTION [ParseJawaban] 

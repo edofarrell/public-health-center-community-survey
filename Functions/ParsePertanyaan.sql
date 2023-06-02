@@ -14,10 +14,8 @@
 	]
 
 	Output Format:
-	key				value
-	idPertanyaan	[INT]
-	pertanyaan		[VARCHAR](150)
-	tipeJawaban		[VARCHAR](10)
+	idPertanyaan	pertanyaan		tipeJawaban
+	[INT]			[VARCHAR](150)	[VARCHAR](10)
 */
 
 ALTER FUNCTION [ParsePertanyaan] 
