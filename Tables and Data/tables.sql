@@ -12,21 +12,21 @@ DROP TABLE
 CREATE TABLE [dbo].[Role]
 (
 	[idRole] [INT] PRIMARY KEY IDENTITY(1, 1) NOT NULL,
-	[namaRole] [VARCHAR](50) NOT NULL,
+	[namaRole] [VARCHAR](20) NOT NULL,
 )
 
 CREATE TABLE [dbo].[User]
 (
 	[idUser] [INT] PRIMARY KEY IDENTITY(1, 1) NOT NULL,
-	[username] [VARCHAR](50) NOT NULL,
-	[password] [VARCHAR](50) NOT NULL,
+	[username] [VARCHAR](20) NOT NULL,
+	[password] [VARCHAR](20) NOT NULL,
 	[idRole] [INT] NOT NULL --FK Role(idRole)
 )
 
 CREATE TABLE [dbo].[Survei]
 (
 	[idSurvei] [INT] PRIMARY KEY IDENTITY(1,1) NOT NULL,
-	[namaSurvei] [VARCHAR](100) NOT NULL,
+	[namaSurvei] [VARCHAR](50) NOT NULL,
 	[timestamp] [DATETIME] NOT NULL,
 	[tombstone] [BIT] NOT NULL
 )
@@ -35,7 +35,7 @@ CREATE TABLE [dbo].[MengaksesSurvei]
 (
 	[idUser] [INT] NOT NULL, --FK User(idUser)
 	[idSurvei] [INT] NOT NULL, --FK Survei(idSurvei)
-	CONSTRAINT UC_AksesSurvei UNIQUE (idUser, idSurvei)
+	CONSTRAINT UC_AksesSurvei UNIQUE(idUser, idSurvei)
 )
 
 CREATE TABLE [dbo].[GroupJawaban]
@@ -52,7 +52,7 @@ CREATE TABLE [dbo].[GroupJawaban]
 CREATE TABLE [dbo].[PertanyaanSurvei]
 (
 	[idPertanyaanSurvei] [INT] PRIMARY KEY IDENTITY(1,1) NOT NULL,
-	[pertanyaan] [VARCHAR](100) NOT NULL,
+	[pertanyaan] [VARCHAR](150) NOT NULL,
 	[tipeJawaban] [VARCHAR](10) NOT NULL,
 	[timestamp] [DATETIME] NOT NULL,
 	[tombstone] [BIT] NOT NULL,
@@ -84,7 +84,7 @@ CREATE TABLE [dbo].[JawabanNumeric]
 CREATE TABLE [dbo].[JawabanString]
 (
 	[idJawabanString] [INT] PRIMARY KEY IDENTITY(1,1) NOT NULL,
-	[jawabanString] [VARCHAR](50) NOT NULL,
+	[jawabanString] [VARCHAR](300) NOT NULL,
 	[timestamp] [DATETIME] NOT NULL,
 	[tombstone] [BIT] NOT NULL,
 	[idPertanyaan] [INT] NOT NULL, --FK PertanyaanSurvei([idPertanyaanSurvei])
