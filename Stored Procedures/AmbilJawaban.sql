@@ -4,13 +4,13 @@ AS
 	DECLARE @result TABLE
 	(
 		[idPertanyaan] [INT],
-		[jawaban] [VARCHAR](50)
+		[jawaban] [VARCHAR](300)
 	)
 
 	INSERT INTO @result
 	SELECT
 		[idPertanyaan],
-		CAST([jawabanNumeric] AS [VARCHAR](50))
+		CAST([jawabanNumeric] AS [VARCHAR])
 	FROM
 		[JawabanNumeric]
 	WHERE
@@ -20,7 +20,7 @@ AS
 	INSERT INTO @result
 	SELECT
 		[idPertanyaan],
-		CAST([jawabanDate] AS [VARCHAR](50))
+		CAST([jawabanDate] AS [VARCHAR])
 	FROM
 		[JawabanDate]
 	WHERE
