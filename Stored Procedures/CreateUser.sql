@@ -1,6 +1,6 @@
 ALTER PROCEDURE [CreateUser]
-	@username [VARCHAR](50),
-	@password [VARCHAR](50),
+	@username [VARCHAR](20),
+	@password [VARCHAR](20),
 	@idRole [INT]
 AS
 	INSERT INTO 

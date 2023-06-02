@@ -1,6 +1,6 @@
-CREATE PROCEDURE [UpdateUser]
-	@newUsername [VARCHAR](50),
-	@newPassword [VARCHAR](50),
+ALTER PROCEDURE [UpdateUser]
+	@newUsername [VARCHAR](20),
+	@newPassword [VARCHAR](20),
 	@idUser [INT]
 AS
 	UPDATE 
