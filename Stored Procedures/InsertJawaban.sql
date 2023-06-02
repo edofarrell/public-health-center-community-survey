@@ -6,11 +6,11 @@
 ALTER PROCEDURE [InsertJawaban]
 	@idUser [INT],
 	@idSurvei [INT],
-	@strJawaban [VARCHAR](1000)
+	@jsonJawaban [NVARCHAR](3100)
 AS
 	DECLARE 
 		@currIdPertanyaan [INT],
-		@currJawaban [VARCHAR](100),
+		@currJawaban [VARCHAR](300),
 		@currTipeJawaban [VARCHAR](10),
 		@idGroupJawaban [INT]
 
@@ -24,7 +24,7 @@ AS
 	DECLARE @tabelJawaban TABLE
 	(
 		[idPertanyaan] [INT],
-		[jawaban] [VARCHAR](1000)
+		[jawaban] [VARCHAR](300)
 	)
 
 	INSERT INTO @tabelJawaban
@@ -32,7 +32,7 @@ AS
 		[idPertanyaan],
 		[jawaban]
 	FROM
-		ParseJawaban(@strJawaban)
+		ParseJawaban(@jsonJawaban)
 
 	DECLARE cursorJawaban CURSOR
 	FOR
