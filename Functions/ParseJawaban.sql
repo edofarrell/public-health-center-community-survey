@@ -16,6 +16,7 @@
 	idPertanyaan	[INT]
 	jawaban			[VARCHAR](150)
 */
+
 ALTER FUNCTION [ParseJawaban] 
 (
 	@str [NVARCHAR](1000)
