@@ -36,7 +36,11 @@ AS
 	DECLARE 
 		@currIdPertanyaan [INT],
 		@currJawaban [VARCHAR](300),
-		@currTipeJawaban [VARCHAR](10)
+		@currTipeJawaban [VARCHAR](10),
+		@isSuccess [BIT]
+
+	SET
+		@isSuccess = 1
 
 	FETCH NEXT FROM
 		cursorJawaban
@@ -106,3 +110,6 @@ AS
 
 	CLOSE cursorJawaban
 	DEALLOCATE cursorJawaban
+
+	SELECT
+		@isSuccess
