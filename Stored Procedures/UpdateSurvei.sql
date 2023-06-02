@@ -1,3 +1,25 @@
+/*
+	JSON Input Format:
+	{
+	 "namaSurvei": [STRING],
+	 "pertanyaan": 
+		[
+			{
+				"idPertanyaan": [NUMBER],
+				"pertanyaan":	[STRING],
+				"tipeJawaban":	[STRING]
+			},
+			{
+				"idPertanyaan": [NUMBER],
+				"pertanyaan": 	[STRING],
+				"tipeJawaban":	[STRING]
+			}
+		]
+	}
+	
+	Each Field (namaSurvei, pertanyaan) is optional
+*/
+
 ALTER PROCEDURE [UpdateSurvei]
 	@idSurvei [INT],
 	@jsonSurvei [NVARCHAR](2250)
