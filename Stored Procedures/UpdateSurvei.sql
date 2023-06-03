@@ -40,6 +40,8 @@ AS
 			[Survei]
 		SET
 			[namaSurvei] = @namaSurvei
+		WHERE
+			[Survei].[idSurvei] = @idSurvei
 	END
 
 	IF(@jsonPertanyaan IS NOT NULL)
