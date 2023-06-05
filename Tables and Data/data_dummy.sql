@@ -1,9 +1,6 @@
-INSERT INTO
-	[Role]([namaRole])
-VALUES
-	('Admin'),
-	('Kader'),
-	('Penanggung Jawab')
+EXEC CreateRole 'Admin'
+EXEC CreateRole 'Kader'
+EXEC CreateRole 'Penanggung Jawab'
 
 --Create User
 --Dearen = Admin
