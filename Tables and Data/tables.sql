@@ -1,13 +1,13 @@
 DROP TABLE 
-	[dbo].[Role],
-	[dbo].[User],
-	[dbo].[Survei],
-	[dbo].[MengaksesSurvei],
-	[dbo].[GroupJawaban],
-	[dbo].[PertanyaanSurvei],
-	[dbo].[JawabanDate],
+	[dbo].[JawabanString],
 	[dbo].[JawabanNumeric],
-	[dbo].[JawabanString]
+	[dbo].[JawabanDate],
+	[dbo].[PertanyaanSurvei],
+	[dbo].[GroupJawaban],
+	[dbo].[MengaksesSurvei],
+	[dbo].[Survei],
+	[dbo].[User],
+	[dbo].[Role]
 
 CREATE TABLE [dbo].[Role]
 (
