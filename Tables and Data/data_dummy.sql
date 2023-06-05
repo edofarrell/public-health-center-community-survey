@@ -72,7 +72,7 @@ DECLARE @pertanyaanSurvei1 NVarChar(2150) =
 	{
 		"pertanyaan": "Pernah terjangkit Covid19?",
 		"tipeJawaban": "STRING"
-	},
+	}
 ]'
 
 DECLARE @pertanyaanSurvei2 NVarChar(2150) = 
@@ -96,7 +96,7 @@ DECLARE @pertanyaanSurvei2 NVarChar(2150) =
 	{
 		"pertanyaan": "Sudah berapa kali anda terkena demam berdarah?",
 		"tipeJawaban": "NUMERIC"
-	},
+	}
 ]'
 
 DECLARE @pertanyaanSurvei3 NVarChar(2150) = 
@@ -120,7 +120,7 @@ DECLARE @pertanyaanSurvei3 NVarChar(2150) =
 	{
 		"pertanyaan": "Apakah anda sering membeli makanan di luar?",
 		"tipeJawaban": "STRING"
-	},
+	}
 ]'
 
 EXEC InsertPertanyaan 1, @pertanyaanSurvei1
