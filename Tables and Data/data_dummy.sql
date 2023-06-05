@@ -9,9 +9,9 @@ VALUES
 --Dearen = Admin
 --Edo = Kader
 --Neil = Penanggung Jawab
-EXEC CreateUser 'dearen','password',1
-EXEC CreateUser 'edo','password',2
-EXEC CreateUser 'neil','password',3
+EXEC CreateUser 'dearen', 'password', 1
+EXEC CreateUser 'edo', 'password', 2
+EXEC CreateUser 'neil', 'password', 3
 
 --Create Survei
 EXEC CreateSurvei 'Covid19'
@@ -27,8 +27,8 @@ VALUES
 	(3, 3)
 
 --Insert Jawaban Survei
-EXEC InsertJawaban 1,1,'
-[
+DECLARE @jawaban11 [NVARCHAR](3350) =
+'[
 	{
 		"idPertanyaan": 1,
 		"jawaban": "Edo Farrell"
@@ -51,8 +51,8 @@ EXEC InsertJawaban 1,1,'
 	}
 ]'
 
-EXEC InsertJawaban 1,1,'
-[
+DECLARE @jawaban12 [NVARCHAR](3350) =
+'[
 	{
 		"idPertanyaan": 1,
 		"jawaban": "Erwin Darsono"
@@ -72,11 +72,15 @@ EXEC InsertJawaban 1,1,'
 	{
 		"idPertanyaan": 5,
 		"jawaban": "Belum"
+	},
+	{
+		"idPertanyaan": 6,
+		"jawaban": "Ada"
 	}
 ]'
 
-EXEC InsertJawaban 2,2,'
-[
+DECLARE @jawaban21 [NVARCHAR](3350) =
+'[
 	{
 		"idPertanyaan": 6,
 		"jawaban": "Dearen Hippy"
@@ -99,8 +103,8 @@ EXEC InsertJawaban 2,2,'
 	}
 ]'
 
-EXEC InsertJawaban 3,3,'
-[
+DECLARE @jawaban31 [NVARCHAR](3350) =
+'[
 	{
 		"idPertanyaan": 11,
 		"jawaban": "Neil Christopher"
@@ -123,28 +127,12 @@ EXEC InsertJawaban 3,3,'
 	}
 ]'
 
-/*INSERT INTO
-	[PertanyaanSurvei]([pertanyaan], [tipeJawaban], [timestamp], [tombstone], [idSurvei])
-VALUES
-	('Nama anda siapa?', 'STRING', CURRENT_TIMESTAMP, 1, 1),
-	('Umur anda berapa?', 'NUMERIC', CURRENT_TIMESTAMP, 1, 1),
-	('Sudah vaksin kedua?', 'STRING', CURRENT_TIMESTAMP, 1, 1),
-	('Vaksin terakhir tanggal berapa?', 'DATE', CURRENT_TIMESTAMP, 1, 1),
-	('Pernah terjangkit Covid19?', 'STRING', CURRENT_TIMESTAMP, 1, 1),
+EXEC InsertJawaban 1, 1, @jawaban11
+EXEC InsertJawaban 1, 1, @jawaban12
+EXEC InsertJawaban 2, 2, @jawaban21
+EXEC InsertJawaban 3, 3, @jawaban31
 
-	('Nama anda siapa?', 'STRING', CURRENT_TIMESTAMP, 1, 2),
-	('Umur anda berapa?', 'NUMERIC', CURRENT_TIMESTAMP, 1, 2),
-	('Kapan terakhir mengalami demam berdarah?', 'DATE', CURRENT_TIMESTAMP, 1, 2),
-	('Apakah lingkungan tempat tinggal anda banyak nyamuk?', 'STRING', CURRENT_TIMESTAMP, 1, 2),
-	('Sudah berapa kali anda terkena demam berdarah?', 'NUMERIC', CURRENT_TIMESTAMP, 1, 2),
-
-	('Nama anda siapa?', 'STRING', CURRENT_TIMESTAMP, 1, 3),
-	('Umur anda berapa?', 'NUMERIC', CURRENT_TIMESTAMP, 1, 3),
-	('Kapan terakhir mengalami diare?', 'DATE', CURRENT_TIMESTAMP, 1, 3),
-	('Apakah anda sering membeli makanan di luar?', 'STRING', CURRENT_TIMESTAMP, 1, 3),
-	('Apakah anda memiliki riwayat penyakit perut?', 'STRING', CURRENT_TIMESTAMP, 1, 3)*/
-
-DECLARE @pertanyaanSurvei1 NVarChar(2150) = 
+DECLARE @pertanyaanSurvei1 [NVARCHAR](2150) = 
 '[
 	{
 		"pertanyaan": "Nama anda siapa?",
@@ -165,10 +153,18 @@ DECLARE @pertanyaanSurvei1 NVarChar(2150) =
 	{
 		"pertanyaan": "Pernah terjangkit Covid19?",
 		"tipeJawaban": "STRING"
+	},
+	{
+		"pertanyaan": "Apakah ada gejala batuk dalam seminggu terakhir?",
+		"tipeJawaban": "STRING"
+	},
+	{
+		"pertanyaan": "Apakah pernah demam dalam seminggu terakhir?",
+		"tipeJawaban": "STRING"
 	}
 ]'
 
-DECLARE @pertanyaanSurvei2 NVarChar(2150) = 
+DECLARE @pertanyaanSurvei2 [NVARCHAR](2150) = 
 '[
 	{
 		"pertanyaan": "Nama anda siapa?",
@@ -192,7 +188,7 @@ DECLARE @pertanyaanSurvei2 NVarChar(2150) =
 	}
 ]'
 
-DECLARE @pertanyaanSurvei3 NVarChar(2150) = 
+DECLARE @pertanyaanSurvei3 [NVARCHAR](2150) = 
 '[
 	{
 		"pertanyaan": "Nama anda siapa?",
