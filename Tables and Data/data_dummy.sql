@@ -30,7 +30,7 @@ VALUES
 	(2, 2),
 	(2, 3)
 
-INSERT INTO
+/*INSERT INTO
 	[PertanyaanSurvei]([pertanyaan], [tipeJawaban], [timestamp], [tombstone], [idSurvei])
 VALUES
 	('Nama anda siapa?', 'STRING', CURRENT_TIMESTAMP, 1, 1),
@@ -49,4 +49,80 @@ VALUES
 	('Umur anda berapa?', 'NUMERIC', CURRENT_TIMESTAMP, 1, 3),
 	('Kapan terakhir mengalami diare?', 'DATE', CURRENT_TIMESTAMP, 1, 3),
 	('Apakah anda sering membeli makanan di luar?', 'STRING', CURRENT_TIMESTAMP, 1, 3),
-	('Apakah anda memiliki riwayat penyakit perut?', 'STRING', CURRENT_TIMESTAMP, 1, 3)
+	('Apakah anda memiliki riwayat penyakit perut?', 'STRING', CURRENT_TIMESTAMP, 1, 3)*/
+
+DECLARE @pertanyaanSurvei1 NVarChar(2150) = 
+'[
+	{
+		"pertanyaan": "Nama anda siapa?",
+		"tipeJawaban": "STRING"
+	},
+	{
+		"pertanyaan": "Umur anda berapa?",
+		"tipeJawaban": "NUMERIC"
+	},
+	{
+		"pertanyaan": "Sudah vaksin kedua?",
+		"tipeJawaban": "STRING"
+	},
+	{
+		"pertanyaan": "Vaksin terakhir tanggal berapa?",
+		"tipeJawaban": "DATE"
+	},
+	{
+		"pertanyaan": "Pernah terjangkit Covid19?",
+		"tipeJawaban": "STRING"
+	},
+]'
+
+DECLARE @pertanyaanSurvei2 NVarChar(2150) = 
+'[
+	{
+		"pertanyaan": "Nama anda siapa?",
+		"tipeJawaban": "STRING"
+	},
+	{
+		"pertanyaan": "Umur anda berapa?",
+		"tipeJawaban": "NUMERIC"
+	},
+	{
+		"pertanyaan": "Kapan terakhir mengalami demam berdarah?",
+		"tipeJawaban": "DATE"
+	},
+	{
+		"pertanyaan": "Apakah lingkungan tempat tinggal anda banyak nyamuk?",
+		"tipeJawaban": "STRING"
+	},
+	{
+		"pertanyaan": "Sudah berapa kali anda terkena demam berdarah?",
+		"tipeJawaban": "NUMERIC"
+	},
+]'
+
+DECLARE @pertanyaanSurvei3 NVarChar(2150) = 
+'[
+	{
+		"pertanyaan": "Nama anda siapa?",
+		"tipeJawaban": "STRING"
+	},
+	{
+		"pertanyaan": "Umur anda berapa?",
+		"tipeJawaban": "NUMERIC"
+	},
+	{
+		"pertanyaan": "Kapan terakhir mengalami diare?",
+		"tipeJawaban": "DATE"
+	},
+	{
+		"pertanyaan": "Apakah anda sering membeli makanan di luar?",
+		"tipeJawaban": "STRING"
+	},
+	{
+		"pertanyaan": "Apakah anda sering membeli makanan di luar?",
+		"tipeJawaban": "STRING"
+	},
+]'
+
+EXEC InsertPertanyaan 1, @pertanyaanSurvei1
+EXEC InsertPertanyaan 2, @pertanyaanSurvei2
+EXEC InsertPertanyaan 3, @pertanyaanSurvei3
