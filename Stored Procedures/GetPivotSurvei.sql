@@ -42,17 +42,18 @@ AS
 	)
 
 	INSERT INTO #jawabanNumeric
-	SELECT 
-		[GroupJawaban].[idGroupJawaban],
-		[JawabanNumeric].[idPertanyaan],
+	SELECT
+		[JawabanNumeric].[idGroupJawaban],
+		[PertanyaanSurvei].[idPertanyaanSurvei],
 		[JawabanNumeric].[jawabanNumeric]
 	FROM
 		[JawabanNumeric]
-		INNER JOIN [GroupJawaban]
-			ON [JawabanNumeric].[idGroupJawaban] = [GroupJawaban].[idGroupJawaban]
+		RIGHT OUTER JOIN [PertanyaanSurvei]
+			ON [JawabanNumeric].[idPertanyaan] = [PertanyaanSurvei].[idPertanyaanSurvei]
 	WHERE 
-		[GroupJawaban].[idSurvei] = @idSurvei
-		AND [JawabanNumeric].[tombstone] = 1
+		[PertanyaanSurvei].[idSurvei] = @idSurvei
+		AND [PertanyaanSurvei].[tipeJawaban] = 'NUMERIC'
+		AND ([JawabanNumeric].[tombstone] = 1 OR [JawabanNumeric].[tombstone] iS NULL)
 
 	DECLARE cursorIdNumeric CURSOR
 	FOR
@@ -117,17 +118,18 @@ AS
 	)
 
 	INSERT INTO #jawabanDate
-	SELECT 
-		[GroupJawaban].[idGroupJawaban],
-		[JawabanDate].[idPertanyaan],
+	SELECT
+		[JawabanDate].[idGroupJawaban],
+		[PertanyaanSurvei].[idPertanyaanSurvei],
 		[JawabanDate].[jawabanDate]
 	FROM
 		[JawabanDate]
-		INNER JOIN [GroupJawaban]
-			ON [JawabanDate].[idGroupJawaban] = [GroupJawaban].[idGroupJawaban]
+		RIGHT OUTER JOIN [PertanyaanSurvei]
+			ON [JawabanDate].[idPertanyaan] = [PertanyaanSurvei].[idPertanyaanSurvei]
 	WHERE 
-		[GroupJawaban].[idSurvei] = @idSurvei
-		AND [JawabanDate].[tombstone] = 1
+		[PertanyaanSurvei].[idSurvei] = @idSurvei
+		AND [PertanyaanSurvei].[tipeJawaban] = 'DATE'
+		AND ([JawabanDate].[tombstone] = 1 OR [JawabanDate].[tombstone] iS NULL)
 
 	SET @queryId = ''
 	SET @queryType = ''
@@ -196,16 +198,17 @@ AS
 
 	INSERT INTO #jawabanString
 	SELECT 
-		[GroupJawaban].[idGroupJawaban],
-		[JawabanString].[idPertanyaan],
+		[JawabanString].[idGroupJawaban],
+		[PertanyaanSurvei].[idPertanyaanSurvei],
 		[JawabanString].[jawabanString]
 	FROM
 		[JawabanString]
-		INNER JOIN [GroupJawaban]
-			ON [JawabanString].[idGroupJawaban] = [GroupJawaban].[idGroupJawaban]
+		RIGHT OUTER JOIN [PertanyaanSurvei]
+			ON [JawabanString].[idPertanyaan] = [PertanyaanSurvei].[idPertanyaanSurvei]
 	WHERE 
-		[GroupJawaban].[idSurvei] = @idSurvei
-		AND [JawabanString].[tombstone] = 1
+		[PertanyaanSurvei].[idSurvei] = @idSurvei
+		AND [PertanyaanSurvei].[tipeJawaban] = 'STRING'
+		AND ([JawabanString].[tombstone] = 1 OR [JawabanString].[tombstone] iS NULL)
 
 	SET @queryId = ''
 	SET @queryType = ''
