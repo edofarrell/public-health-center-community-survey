@@ -9,7 +9,8 @@
 */
 
 ALTER PROCEDURE [GetPivotSurvei]
-	@idSurvei [INT]
+	@idSurvei [INT],
+	@jsonFilter [NVARCHAR](1000)
 AS
 	DECLARE
 		@queryInsert [NVARCHAR](4000),
@@ -19,9 +20,13 @@ AS
 		@queryId [NVARCHAR](100),
 		@queryType [NVARCHAR](500),
 		@querySelect [NVARCHAR](200),
+		@queryFilter [NVARCHAR](1000),
 		@guid [NVARCHAR](2000),
 		@currIdPertanyaan [INT],
-		@currTipeJawaban [VARCHAR](10)
+		@currTipeJawaban [VARCHAR](10),
+		@currFilter [VARCHAR](30),
+		@lowerBound [VARCHAR](15),
+		@upperBound [VARCHAR](15)
 
 	SET @guid = REPLACE(NEWID(), '-', '')
 	SET @queryInsert = ''
@@ -32,6 +37,7 @@ AS
 	SET @queryId = ''
 	SET @queryType = ''
 	SET @querySelect = ''
+	SET @queryFilter = ''
 
 	-- Pivot + Agregasi dan Filter semua jawaban numeric
 	CREATE TABLE #jawabanNumeric
@@ -100,15 +106,54 @@ AS
 				+ ' SELECT idGroupJawaban,' + @queryId + ' FROM #jawabanNumeric' 
 				+ ' pivot(MAX(jawaban) FOR idPertanyaan IN (' + @queryId + ')) AS p'
 
+	/* Agregasi + Filter data numeric */
+	DECLARE cursorFilter CURSOR
+	FOR
+		SELECT 
+			[idPertanyaan],
+			[filter]
+		FROM
+			ParseFilter(@jsonFilter)
+		WHERE
+			[tipeJawaban] = 'NUMERIC'
+	OPEN cursorFilter
+
+	FETCH NEXT FROM
+		cursorFilter
+	INTO
+		@currIdPertanyaan,
+		@currFilter
+
+	WHILE(@@FETCH_STATUS = 0)
+	BEGIN
+		SET @lowerBound = SUBSTRING(@currFilter, 0, CHARINDEX(',', @currFilter))
+		SET @upperBound = SUBSTRING(@currFilter, CHARINDEX(',', @currFilter)+1, LEN(@currFilter))
+		SET @queryFilter = @queryFilter + ' AND [' + CAST(@currIdPertanyaan AS NVARCHAR)+ ']'
+						+ '>=' + @lowerBound + ' AND [' + CAST(@currIdPertanyaan AS NVARCHAR)+ ']'
+						+ '<=' + @upperBound
+
+		FETCH NEXT FROM
+			cursorFilter
+		INTO
+			@currIdPertanyaan,
+			@currFilter
+	END
+
+	CLOSE cursorFilter
+	DEALLOCATE cursorFilter
+
+	IF(LEN(@queryFilter) > 0)
+	BEGIN
+		SET @queryFilter = SUBSTRING(@queryFilter, 5, LEN(@queryFilter))
+		SET @queryInsert = @queryInsert + ' WHERE ' + @queryFilter
+	END
+	
 	EXEC SP_EXECUTESQL @queryCreateTable
 	EXEC SP_EXECUTESQL @queryInsert
 
 	--SET @query = 'SELECT * FROM ##numericPivot_' + @guid
 	--EXEC SP_EXECUTESQL @query
 
-	/* Agregasi + Filter data numeric */
-
-	
 	-- Pivot + Agregasi dan Filter semua jawaban date
 	CREATE TABLE #jawabanDate
 	(
@@ -179,14 +224,55 @@ AS
 				+ ' SELECT idGroupJawaban,' + @queryId + ' FROM #jawabanDate' 
 				+ ' pivot(MAX(jawaban) FOR idPertanyaan IN (' + @queryId + ')) AS p'
 
+	/* Agregasi + Filter data date */
+	SET @queryFilter = ''
+
+	DECLARE cursorFilter CURSOR
+	FOR
+		SELECT 
+			[idPertanyaan],
+			[filter]
+		FROM
+			ParseFilter(@jsonFilter)
+		WHERE
+			[tipeJawaban] = 'DATE'
+	OPEN cursorFilter
+
+	FETCH NEXT FROM
+		cursorFilter
+	INTO
+		@currIdPertanyaan,
+		@currFilter
+
+	WHILE(@@FETCH_STATUS = 0)
+	BEGIN
+		SET @lowerBound = SUBSTRING(@currFilter, 0, CHARINDEX(',', @currFilter))
+		SET @upperBound = SUBSTRING(@currFilter, CHARINDEX(',', @currFilter)+1, LEN(@currFilter))
+		SET @queryFilter = @queryFilter + ' AND [' + CAST(@currIdPertanyaan AS NVARCHAR)+ ']'
+						+ '>=''' + @lowerBound + ''' AND [' + CAST(@currIdPertanyaan AS NVARCHAR)+ ']'
+						+ '<=''' + @upperBound + ''''
+
+		FETCH NEXT FROM
+			cursorFilter
+		INTO
+			@currIdPertanyaan,
+			@currFilter
+	END
+
+	CLOSE cursorFilter
+	DEALLOCATE cursorFilter
+
+	IF(LEN(@queryFilter) > 0)
+	BEGIN
+		SET @queryFilter = SUBSTRING(@queryFilter, 5, LEN(@queryFilter))
+		SET @queryInsert = @queryInsert + ' WHERE ' + @queryFilter
+	END
+
 	EXEC SP_EXECUTESQL @queryCreateTable
 	EXEC SP_EXECUTESQL @queryInsert
 
 	--SET @query = 'SELECT * FROM ##datePivot_' + @guid
 	--EXEC SP_EXECUTESQL @query
-
-	/* Agregasi + Filter data date */
-
 
 	-- Pivot + Agregasi dan Filter semua jawaban string
 	CREATE TABLE #jawabanString
@@ -258,14 +344,52 @@ AS
 				+ ' SELECT idGroupJawaban,' + @queryId + ' FROM #jawabanString' 
 				+ ' pivot(MAX(jawaban) FOR idPertanyaan IN (' + @queryId + ')) AS p'
 
+	/* Agregasi + Filter data string */
+	SET @queryFilter = ''
+
+	DECLARE cursorFilter CURSOR
+	FOR
+		SELECT 
+			[idPertanyaan],
+			[filter]
+		FROM
+			ParseFilter(@jsonFilter)
+		WHERE
+			[tipeJawaban] = 'STRING'
+	OPEN cursorFilter
+
+	FETCH NEXT FROM
+		cursorFilter
+	INTO
+		@currIdPertanyaan,
+		@currFilter
+
+	WHILE(@@FETCH_STATUS = 0)
+	BEGIN
+		SET @queryFilter = @queryFilter + ' AND [' + CAST(@currIdPertanyaan AS NVARCHAR)+ ']'
+						+ ' LIKE ''%' + @currFilter + '%'''
+
+		FETCH NEXT FROM
+			cursorFilter
+		INTO
+			@currIdPertanyaan,
+			@currFilter
+	END
+
+	CLOSE cursorFilter
+	DEALLOCATE cursorFilter
+
+	IF(LEN(@queryFilter) > 0)
+	BEGIN
+		SET @queryFilter = SUBSTRING(@queryFilter, 5, LEN(@queryFilter))
+		SET @queryInsert = @queryInsert + ' WHERE ' + @queryFilter
+	END
+
 	EXEC SP_EXECUTESQL @queryCreateTable
 	EXEC SP_EXECUTESQL @queryInsert
 
 	--SET @query = 'SELECT * FROM ##stringPivot_' + @guid
 	--EXEC SP_EXECUTESQL @query
-
-	/* Agregasi + Filter data string */
-
 
 	/* 
 		Di titik ini sudah dapat semua jawaban yang sudah diagregasi dan filter,

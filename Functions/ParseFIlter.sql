@@ -3,19 +3,21 @@
 	[
 		{
 			"idPertanyaan": 1,
-			"lowerBound": "2",
-			"upperBound": "4"
+			"filter": "abc"
 		},
 		{
 			"idPertanyaan": 2,
-			"lowerBound": "2023-01-01",
-			"upperBound": "20203-01-02"
+			"filter": "1,2"
+		},
+		{
+			"idPertanyaan": 3,
+			"filter": "2023-01-01,2023-01-02"
 		}
 	]
 
 	Output Format:
-	idPertanyaan	lowerBound		upperBound		tipeJawaban
-	[INT]			[VARCHAR](15)	[VARCHAR](15)	[VARCHAR](10)
+	idPertanyaan	filter			tipeJawaban
+	[INT]			[VARCHAR](50)	[VARCHAR](10)
 */
 
 ALTER FUNCTION [ParseFilter] 
@@ -25,8 +27,7 @@ ALTER FUNCTION [ParseFilter]
 RETURNS @result TABLE
 (
 	[idPertanyaan] [INT],
-	[lowerBound] [VARCHAR](15),
-	[upperBound] [VARCHAR](15),
+	[filter] [VARCHAR](50),
 	[tipeJawaban] [VARCHAR](10)
 )
 AS
@@ -52,8 +53,7 @@ BEGIN
 		INSERT INTO @result
 		SELECT
 			[j].[idPertanyaan],
-			[j].[lowerBound],
-			[j].[upperBound],
+			[j].[filter],
 			[PertanyaanSurvei].[tipeJawaban]
 		FROM
 			[PertanyaanSurvei]
@@ -61,8 +61,7 @@ BEGIN
 			WITH
 				(
 					[idPertanyaan] [INT] '$.idPertanyaan',
-					[lowerBound] [VARCHAR](15) '$.lowerBound',
-					[upperBound] [VARCHAR](15) '$.upperBound'
+					[filter] [VARCHAR](30) '$.filter'
 				) J
 				ON J.[idPertanyaan] = [PertanyaanSurvei].[idPertanyaanSurvei] 
 
