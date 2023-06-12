@@ -1,7 +1,6 @@
-ALTER PROCEDURE HistoryJawaban
+ALTER PROCEDURE [HistoryJawaban]
 	@idGroupJawaban [INT]
 AS
-
 	DECLARE @result TABLE(
 		[jawaban] [VARCHAR](100),
 		[timestamp] [DATETIME],
@@ -10,27 +9,29 @@ AS
 		[idUser] [INT]
 	)
 
-	INSERT INTO @result
+	INSERT INTO 
+		@result
 	SELECT
-		CONVERT(VARCHAR,[JawabanDate].[jawabanDate]),
+		CONVERT([VARCHAR],[JawabanDate].[jawabanDate]),
 		[JawabanDate].[timestamp],
 		[JawabanDate].[tombstone],
 		[JawabanDate].[idPertanyaan],
 		[JawabanDate].[idUser]
 	FROM
-		JawabanDate
+		[JawabanDate]
 	WHERE
 		[JawabanDate].[idGroupJawaban] = @idGroupJawaban
 
-	INSERT INTO @result
+	INSERT INTO 
+		@result
 	SELECT
-		CONVERT(VARCHAR,[JawabanNumeric].[jawabanNumeric]),
+		CONVERT([VARCHAR],[JawabanNumeric].[jawabanNumeric]),
 		[JawabanNumeric].[timestamp],
 		[JawabanNumeric].[tombstone],
 		[JawabanNumeric].[idPertanyaan],
 		[JawabanNumeric].[idUser]
 	FROM
-		JawabanNumeric
+		[JawabanNumeric]
 	WHERE
 		[JawabanNumeric].[idGroupJawaban] = @idGroupJawaban
 	
@@ -42,7 +43,7 @@ AS
 		[JawabanString].[idPertanyaan],
 		[JawabanString].[idUser]
 	FROM
-		JawabanString
+		[JawabanString]
 	WHERE
 		[JawabanString].[idGroupJawaban] = @idGroupJawaban
 
