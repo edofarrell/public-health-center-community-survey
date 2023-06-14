@@ -22,8 +22,6 @@ AS
 
 	SET 
 		@idGroupJawaban = @@IDENTITY
-	SET
-		@isSuccess = 1
 
 	DECLARE @tabelJawaban TABLE
 	(
@@ -91,6 +89,8 @@ AS
 
 	CLOSE cursorJawaban
 	DEALLOCATE cursorJawaban
-
+	
+	SET
+		@isSuccess = 1
 	SELECT
 		@isSuccess

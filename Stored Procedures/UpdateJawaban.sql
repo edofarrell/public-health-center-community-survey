@@ -39,9 +39,6 @@ AS
 		@currTipeJawaban [VARCHAR](10),
 		@isSuccess [BIT]
 
-	SET
-		@isSuccess = 1
-
 	FETCH NEXT FROM
 		cursorJawaban
 	INTO
@@ -111,5 +108,7 @@ AS
 	CLOSE cursorJawaban
 	DEALLOCATE cursorJawaban
 
+	SET
+		@isSuccess = 1
 	SELECT
 		@isSuccess
