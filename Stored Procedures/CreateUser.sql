@@ -6,13 +6,26 @@ AS
 	DECLARE
 		@isSuccess [BIT]
 
-	INSERT INTO 
-		[User]([username], [password], [idRole])
-	VALUES
-		(@username, @password, @idRole)
+	BEGIN TRANSACTION
+	BEGIN TRY
+		INSERT INTO 
+			[User]([username], [password], [idRole])
+		VALUES
+			(@username, @password, @idRole)
 
-	SET
-		@isSuccess = 1
+		SET
+			@isSuccess = 1
 
-	SELECT
-		@isSuccess
+		SELECT
+			@isSuccess
+	COMMIT TRANSACTION
+	END TRY
+	BEGIN CATCH
+		SET
+			@isSuccess = 0
+
+		SELECT
+			@isSuccess
+	ROLLBACK TRANSACTION
+	END CATCH
+	

@@ -28,72 +28,56 @@ AS
 		@namaSurvei [VARCHAR](50),
 		@jsonPertanyaan [NVARCHAR](2150)
 
-	SELECT
-		@namaSurvei = [namaSurvei],
-		@jsonPertanyaan = [pertanyaan] 
-	FROM
-		ParseSurvei(@jsonSurvei)
+	DECLARE
+		@currIdPertanyaan [INT],
+		@currPertanyaan [VARCHAR](150),
+		@currTipeJawaban [VARCHAR](10),
+		@isSuccess [BIT]
 
-	IF(@namaSurvei IS NOT NULL)
-	BEGIN
-		UPDATE
-			[Survei]
-		SET
-			[namaSurvei] = @namaSurvei
-		WHERE
-			[Survei].[idSurvei] = @idSurvei
-	END
-
-	IF(@jsonPertanyaan IS NOT NULL)
-	BEGIN
-		DECLARE @tabelPertanyaan TABLE
-		(
-			[idPertanyaan] [INT],
-			[pertanyaan] [VARCHAR](150),
-			[tipeJawaban] [VARCHAR](10)
-		)
-
-		INSERT INTO @tabelPertanyaan
+	BEGIN TRANSACTION
+	BEGIN TRY
 		SELECT
-			[idPertanyaan],
-			[pertanyaan],
-			[tipeJawaban]
+			@namaSurvei = [namaSurvei],
+			@jsonPertanyaan = [pertanyaan] 
 		FROM
-			ParsePertanyaan(@jsonPertanyaan)
+			ParseSurvei(@jsonSurvei)
 
-		DECLARE
-			@currIdPertanyaan [INT],
-			@currPertanyaan [VARCHAR](150),
-			@currTipeJawaban [VARCHAR](10),
-			@isSuccess [BIT]
+		IF(@namaSurvei IS NOT NULL)
+		BEGIN
+			UPDATE
+				[Survei]
+			SET
+				[namaSurvei] = @namaSurvei
+			WHERE
+				[Survei].[idSurvei] = @idSurvei
+		END
 
-		DECLARE cursorPertanyaan CURSOR
-		FOR
+		IF(@jsonPertanyaan IS NOT NULL)
+		BEGIN
+			DECLARE @tabelPertanyaan TABLE
+			(
+				[idPertanyaan] [INT],
+				[pertanyaan] [VARCHAR](150),
+				[tipeJawaban] [VARCHAR](10)
+			)
+
+			INSERT INTO @tabelPertanyaan
 			SELECT
 				[idPertanyaan],
 				[pertanyaan],
 				[tipeJawaban]
 			FROM
-				@tabelPertanyaan
-		OPEN cursorPertanyaan
+				ParsePertanyaan(@jsonPertanyaan)
 
-		FETCH NEXT FROM 
-			cursorPertanyaan
-		INTO
-			@currIdPertanyaan,
-			@currPertanyaan,
-			@currTipeJawaban
-
-		WHILE(@@FETCH_STATUS = 0)
-		BEGIN
-			UPDATE
-				[PertanyaanSurvei]
-			SET
-				[pertanyaan] = @currPertanyaan,
-				[tipeJawaban] = @currTipeJawaban
-			WHERE
-				[idSurvei] = @idSurvei
-				AND [idPertanyaanSurvei] = @currIdPertanyaan
+			DECLARE cursorPertanyaan CURSOR
+			FOR
+				SELECT
+					[idPertanyaan],
+					[pertanyaan],
+					[tipeJawaban]
+				FROM
+					@tabelPertanyaan
+			OPEN cursorPertanyaan
 
 			FETCH NEXT FROM 
 				cursorPertanyaan
@@ -101,14 +85,43 @@ AS
 				@currIdPertanyaan,
 				@currPertanyaan,
 				@currTipeJawaban
+
+			WHILE(@@FETCH_STATUS = 0)
+			BEGIN
+				UPDATE
+					[PertanyaanSurvei]
+				SET
+					[pertanyaan] = @currPertanyaan,
+					[tipeJawaban] = @currTipeJawaban
+				WHERE
+					[idSurvei] = @idSurvei
+					AND [idPertanyaanSurvei] = @currIdPertanyaan
+
+				FETCH NEXT FROM 
+					cursorPertanyaan
+				INTO
+					@currIdPertanyaan,
+					@currPertanyaan,
+					@currTipeJawaban
+			END
+
+			CLOSE idPertanyaan
+			DEALLOCATE idPertanyaan
 		END
 
-		CLOSE idPertanyaan
-		DEALLOCATE idPertanyaan
-	END
+		SET
+			@isSuccess = 1
 
-	SET
-		@isSuccess = 1
+		SELECT
+			@isSuccess
+	COMMIT TRANSACTION
+	END TRY
+	BEGIN CATCH
+		SET
+			@isSuccess = 0
 
-	SELECT
-		@isSuccess
+		SELECT
+			@isSuccess
+	ROLLBACK TRANSACTION
+	END CATCH
+
