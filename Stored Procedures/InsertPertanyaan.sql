@@ -8,52 +8,64 @@ AS
 		[tipeJawaban] [VARCHAR](10)
 	)
 
-	INSERT INTO @tabelPertanyaan
-	SELECT
-		[pertanyaan],
-		[tipeJawaban]
-	FROM
-		ParsePertanyaan(@jsonPertanyaan)
-
 	DECLARE 
 		@currPertanyaan [VARCHAR](150),
 		@currTipeJawaban [VARCHAR](10),
 		@isSuccess [BIT]
 
-	DECLARE cursorPertanyaan CURSOR
-	FOR
+	BEGIN TRANSACTION
+	BEGIN TRY
+		INSERT INTO @tabelPertanyaan
 		SELECT
 			[pertanyaan],
 			[tipeJawaban]
 		FROM
-			@tabelPertanyaan
-	OPEN cursorPertanyaan
+			ParsePertanyaan(@jsonPertanyaan)
 
-	FETCH NEXT FROM 
-		cursorPertanyaan
-	INTO
-		@currPertanyaan,
-		@currTipeJawaban
-
-	WHILE(@@FETCH_STATUS = 0)
-	BEGIN
-		INSERT INTO 
-			[PertanyaanSurvei]([pertanyaan], [tipeJawaban], [timestamp], [tombstone], [idSurvei])
-		VALUES
-			(@currPertanyaan, @currTipeJawaban, CURRENT_TIMESTAMP, 1, @idSurvei)
+		DECLARE cursorPertanyaan CURSOR
+		FOR
+			SELECT
+				[pertanyaan],
+				[tipeJawaban]
+			FROM
+				@tabelPertanyaan
+		OPEN cursorPertanyaan
 
 		FETCH NEXT FROM 
 			cursorPertanyaan
 		INTO
 			@currPertanyaan,
 			@currTipeJawaban
-	END
 
-	CLOSE cursorPertanyaan
-	DEALLOCATE cursorPertanyaan
+		WHILE(@@FETCH_STATUS = 0)
+		BEGIN
+			INSERT INTO 
+				[PertanyaanSurvei]([pertanyaan], [tipeJawaban], [timestamp], [tombstone], [idSurvei])
+			VALUES
+				(@currPertanyaan, @currTipeJawaban, CURRENT_TIMESTAMP, 1, @idSurvei)
 
-	SET
-		@isSuccess = 1
+			FETCH NEXT FROM 
+				cursorPertanyaan
+			INTO
+				@currPertanyaan,
+				@currTipeJawaban
+		END
 
-	SELECT
-		@isSuccess
+		CLOSE cursorPertanyaan
+		DEALLOCATE cursorPertanyaan
+
+		SET
+			@isSuccess = 1
+
+		SELECT
+			@isSuccess
+	COMMIT TRANSACTION
+	END TRY
+	BEGIN CATCH
+		SET
+			@isSuccess = 0
+
+		SELECT
+			@isSuccess
+	ROLLBACK TRANSACTION
+	END CATCH

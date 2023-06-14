@@ -5,14 +5,24 @@ AS
 	DECLARE 
 		@isSuccess [BIT]
 
-	SET @isSuccess = 0
+	BEGIN TRANSACTION
+	BEGIN TRY
+		INSERT INTO 
+			[MengaksesSurvei]([idUser], [idSurvei])
+		VALUES
+			(@idUser,@idSurvei)
 
-	INSERT INTO 
-		[MengaksesSurvei]([idUser], [idSurvei])
-	VALUES
-		(@idUser,@idSurvei)
+		SET @isSuccess = 1
 
-	SET @isSuccess = 1
+		SELECT 
+			@isSuccess
 
-	SELECT 
-		@isSuccess
+	COMMIT TRANSACTION
+	END TRY
+	BEGIN CATCH
+		SET @isSuccess = 0
+
+		SELECT 
+			@isSuccess
+	ROLLBACK TRANSACTION
+	END CATCH
