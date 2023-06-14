@@ -15,10 +15,10 @@ AS
 		[User]
 	WHERE
 		[username] = @username
+		AND @passDB = @password
 
-	IF(@password = @passDB)
-	BEGIN
-		SET @isSuccess = 1
-	END
+	SET 
+		@isSuccess = 1
 
-	SELECT @isSuccess
+	SELECT 
+		@isSuccess
