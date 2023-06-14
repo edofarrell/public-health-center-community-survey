@@ -3,76 +3,76 @@
 	[
 		{
 			"idPertanyaan": 1,
-			"filter": "abc"
+			"agregat": "SUM"
 		},
 		{
 			"idPertanyaan": 2,
-			"filter": "1,2"
+			"agregat": "AVG"
 		},
 		{
 			"idPertanyaan": 3,
-			"filter": "2023-01-01,2023-01-02"
+			"agregat": "COUNT"
 		}
 	]
 
 	Output Format:
 	idPertanyaan	filter			tipeJawaban
-	[INT]			[VARCHAR](50)	[VARCHAR](10)
+	[INT]			[VARCHAR](10)	[VARCHAR](10)
 */
 
-ALTER FUNCTION [ParseFilter] 
+ALTER FUNCTION [ParseAgregat]
 (
 	@json [NVARCHAR](1000)
 )
 RETURNS @result TABLE
 (
 	[idPertanyaan] [INT],
-	[filter] [VARCHAR](50),
+	[agregat] [VARCHAR](10),
 	[tipeJawaban] [VARCHAR](10)
 )
 AS
 BEGIN
 	DECLARE 
-		@currFilter [VARCHAR](100)
+		@currAgregat [VARCHAR](100)
 
-	DECLARE cursorFilter CURSOR
+	DECLARE cursorAgregat CURSOR
 	FOR
 		SELECT 
 			[value]
 		FROM
 			OPENJSON(@json)
-	OPEN cursorFilter
+	OPEN cursorAgregat
 
 	FETCH NEXT FROM
-		cursorFilter
+		cursorAgregat
 	INTO
-		@currFilter
+		@currAgregat
 
 	WHILE(@@FETCH_STATUS=0)
 	BEGIN
 		INSERT INTO @result
 		SELECT
 			[j].[idPertanyaan],
-			[j].[filter],
+			[j].[agregat],
 			[PertanyaanSurvei].[tipeJawaban]
 		FROM
 			[PertanyaanSurvei]
-			INNER JOIN OPENJSON(@currFilter)
+			INNER JOIN OPENJSON(@currAgregat)
 			WITH
 				(
 					[idPertanyaan] [INT] '$.idPertanyaan',
-					[filter] [VARCHAR](30) '$.filter'
+					[agregat] [VARCHAR](30) '$.agregat'
 				) J
 				ON J.[idPertanyaan] = [PertanyaanSurvei].[idPertanyaanSurvei] 
 
 		FETCH NEXT FROM
-			cursorFilter
+			cursorAgregat
 		INTO
-			@currFilter
+			@currAgregat
 	END
 	
-	CLOSE cursorFilter
-	DEALLOCATE cursorFilter
+	CLOSE cursorAgregat
+	DEALLOCATE cursorAgregat
 
 	RETURN
 END
