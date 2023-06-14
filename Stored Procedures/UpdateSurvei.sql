@@ -103,8 +103,8 @@ AS
 					@currTipeJawaban
 			END
 
-			CLOSE idPertanyaan
-			DEALLOCATE idPertanyaan
+			CLOSE cursorPertanyaan
+			DEALLOCATE cursorPertanyaan
 		END
 
 		SET @isSuccess = 1
