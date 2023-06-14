@@ -69,7 +69,7 @@ BEGIN
 			cursorFilter
 		INTO
 			@currFilter
-		END
+	END
 	
 	CLOSE cursorFilter
 	DEALLOCATE cursorFilter
