@@ -9,7 +9,7 @@ AS
 		@isSuccess = 0
 
 	SELECT
-		
+		[idUser]
 	FROM
 		[User]
 	WHERE
