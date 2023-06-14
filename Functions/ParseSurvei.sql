@@ -20,7 +20,8 @@
 	Output Format:
 	namaSurvei			pertanyaan
 	[VARCHAR](50)		[NVARCHAR](2150) (JSON Array)
-			
+
+	"tipeJawaban" field: "NUMERIC", "DATE", "STRING"
 */
 
 ALTER FUNCTION [ParseSurvei]

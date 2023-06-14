@@ -1,4 +1,4 @@
-ALTER PROCEDURE [AmbilGroupJawaban]
+ALTER PROCEDURE [GetGroupJawaban]
 	@idUser [INT],
 	@idSurvei [INT],
 	@waktuAwal [DATETIME],
@@ -16,10 +16,12 @@ AS
 			AND [timestamp] <= @waktuAkhir
 		ORDER BY
 			[idGroupJawaban] ASC
-	COMMIT TRANSACTION
+
+		COMMIT TRANSACTION
 	END TRY
 	BEGIN CATCH
 		SELECT
 			0
-	ROLLBACK TRANSACTION
+
+		ROLLBACK TRANSACTION
 	END CATCH

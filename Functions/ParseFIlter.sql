@@ -2,22 +2,23 @@
 	Input Format (JSON Array):
 	[
 		{
-			"idPertanyaan": 1,
-			"filter": "abc"
+			"idPertanyaan": [NUMBER],
+			"filter": [STRING]
 		},
 		{
-			"idPertanyaan": 2,
-			"filter": "1,2"
-		},
-		{
-			"idPertanyaan": 3,
-			"filter": "2023-01-01,2023-01-02"
+			"idPertanyaan": [NUMBER],
+			"filter": [STRING]
 		}
 	]
 
 	Output Format:
 	idPertanyaan	filter			tipeJawaban
 	[INT]			[VARCHAR](50)	[VARCHAR](10)
+
+	"filter" field for each data type:
+	Numeric: "[Lower bound], [Upper bound]"
+	Date: "[Lower bound], [Upper bound]"
+	String: "[String]" (Searches record that contains the input string)
 */
 
 ALTER FUNCTION [ParseFilter] 
@@ -52,8 +53,8 @@ BEGIN
 	BEGIN
 		INSERT INTO @result
 		SELECT
-			[j].[idPertanyaan],
-			[j].[filter],
+			[J].[idPertanyaan],
+			[J].[filter],
 			[PertanyaanSurvei].[tipeJawaban]
 		FROM
 			[PertanyaanSurvei]
@@ -63,7 +64,7 @@ BEGIN
 					[idPertanyaan] [INT] '$.idPertanyaan',
 					[filter] [VARCHAR](30) '$.filter'
 				) J
-				ON J.[idPertanyaan] = [PertanyaanSurvei].[idPertanyaanSurvei] 
+				ON [J].[idPertanyaan] = [PertanyaanSurvei].[idPertanyaanSurvei] 
 
 		FETCH NEXT FROM
 			cursorFilter

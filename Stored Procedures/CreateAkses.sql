@@ -10,19 +10,20 @@ AS
 		INSERT INTO 
 			[MengaksesSurvei]([idUser], [idSurvei])
 		VALUES
-			(@idUser,@idSurvei)
+			(@idUser, @idSurvei)
 
 		SET @isSuccess = 1
 
 		SELECT 
 			@isSuccess
 
-	COMMIT TRANSACTION
+		COMMIT TRANSACTION
 	END TRY
 	BEGIN CATCH
 		SET @isSuccess = 0
 
 		SELECT 
 			@isSuccess
-	ROLLBACK TRANSACTION
+
+		ROLLBACK TRANSACTION
 	END CATCH

@@ -1,6 +1,19 @@
-/*
-	Format
-	Date: YYYY-MM-DD
+/* 
+	@jsonJawaban Format (JSON Array):
+	[
+		{
+			"idPertanyaan": [NUMBER],
+			"jawaban":		[STRING]
+		},
+		{
+			"idPertanyaan": [NUMBER],
+			"jawaban":		[STRING]
+		}
+	]
+
+	Output Format:
+	idPertanyaan	jawaban
+	[INT]			[VARCHAR](300)
 */
 
 ALTER PROCEDURE [InsertJawaban]
@@ -8,6 +21,12 @@ ALTER PROCEDURE [InsertJawaban]
 	@idSurvei [INT],
 	@jsonJawaban [NVARCHAR](3350)
 AS
+	DECLARE @tabelJawaban TABLE
+	(
+		[idPertanyaan] [INT],
+		[jawaban] [VARCHAR](300)
+	)
+
 	DECLARE 
 		@currIdPertanyaan [INT],
 		@currJawaban [VARCHAR](300),
@@ -17,20 +36,12 @@ AS
 
 	BEGIN TRANSACTION
 	BEGIN TRY
-	
 		INSERT INTO 
 			[GroupJawaban]([timestamp], [idSurvei])
 		VALUES
 			(CURRENT_TIMESTAMP, @idSurvei)
 
-		SET 
-			@idGroupJawaban = @@IDENTITY
-
-		DECLARE @tabelJawaban TABLE
-		(
-			[idPertanyaan] [INT],
-			[jawaban] [VARCHAR](300)
-		)
+		SET @idGroupJawaban = @@IDENTITY
 
 		INSERT INTO @tabelJawaban
 		SELECT
@@ -93,16 +104,18 @@ AS
 		CLOSE cursorJawaban
 		DEALLOCATE cursorJawaban
 
-		SET
-			@isSuccess = 1
+		SET @isSuccess = 1
+
 		SELECT
 			@isSuccess
-	COMMIT TRANSACTION
+
+		COMMIT TRANSACTION
 	END TRY
 	BEGIN CATCH
-		SET
-			@isSuccess = 0
+		SET @isSuccess = 0
+
 		SELECT
 			@isSuccess
-	ROLLBACK TRANSACTION
+
+		ROLLBACK TRANSACTION
 	END CATCH

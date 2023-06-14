@@ -1,5 +1,5 @@
 /*
-	JSON Input Format:
+	@jsonSurvei Format:
 	{
 	 "namaSurvei": [STRING],
 	 "pertanyaan": 
@@ -26,9 +26,7 @@ ALTER PROCEDURE [UpdateSurvei]
 AS
 	DECLARE
 		@namaSurvei [VARCHAR](50),
-		@jsonPertanyaan [NVARCHAR](2150)
-
-	DECLARE
+		@jsonPertanyaan [NVARCHAR](2150),
 		@currIdPertanyaan [INT],
 		@currPertanyaan [VARCHAR](150),
 		@currTipeJawaban [VARCHAR](10),
@@ -109,19 +107,18 @@ AS
 			DEALLOCATE idPertanyaan
 		END
 
-		SET
-			@isSuccess = 1
+		SET @isSuccess = 1
 
 		SELECT
 			@isSuccess
-	COMMIT TRANSACTION
+
+		COMMIT TRANSACTION
 	END TRY
 	BEGIN CATCH
-		SET
-			@isSuccess = 0
+		SET @isSuccess = 0
 
 		SELECT
 			@isSuccess
-	ROLLBACK TRANSACTION
-	END CATCH
 
+		ROLLBACK TRANSACTION
+	END CATCH

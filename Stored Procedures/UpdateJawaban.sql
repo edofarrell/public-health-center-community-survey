@@ -1,6 +1,15 @@
-/*
-	Format
-	Date: YYYY-MM-DD
+/* 
+	@jsonJawaban Format (JSON Array):
+	[
+		{
+			"idPertanyaan": [NUMBER],
+			"jawaban":		[STRING]
+		},
+		{
+			"idPertanyaan": [NUMBER],
+			"jawaban":		[STRING]
+		}
+	]
 */
 
 ALTER PROCEDURE [UpdateJawaban]
@@ -110,16 +119,18 @@ AS
 		CLOSE cursorJawaban
 		DEALLOCATE cursorJawaban
 
-		SET
-			@isSuccess = 1
+		SET @isSuccess = 1
+
 		SELECT
 			@isSuccess
-	COMMIT TRANSACTION
+
+		COMMIT TRANSACTION
 	END TRY
 	BEGIN CATCH
-		SET
-			@isSuccess = 0
+		SET @isSuccess = 0
+
 		SELECT
 			@isSuccess
-	ROLLBACK TRANSACTION
+
+		ROLLBACK TRANSACTION
 	END CATCH

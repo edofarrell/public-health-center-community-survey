@@ -45,35 +45,6 @@ AS
 		[tipeJawaban] [VARCHAR](10)
 	)
 
-	INSERT INTO @filter
-	SELECT
-		[idPertanyaan],
-		[filter],
-		[tipeJawaban]
-	FROM
-		ParseFilter(@jsonFilter)
-
-	INSERT INTO @agregat
-	SELECT
-		[idPertanyaan],
-		[agregat],
-		[tipeJawaban]
-	FROM
-		ParseAgregat(@jsonAgregat)
-
-	SET @guid = REPLACE(NEWID(), '-', '')
-	SET @queryInsert = ''
-	SET @queryCreateTable = ''
-	SET @queryDropTable = 'DROP TABLE ##numericPivot_' + @guid
-							+ ', ##datePivot_' + @guid
-							+ ', ##stringPivot_' + @guid
-	SET @queryId = ''
-	SET @queryType = ''
-	SET @querySelect = ''
-	SET @queryFilter = ''
-	SET @queryAgregat = ''
-
-	-- Pivot + Agregasi dan Filter semua jawaban numeric
 	CREATE TABLE #jawabanNumeric
 	(
 		idGroupJawaban [INT],
@@ -81,117 +52,6 @@ AS
 		jawaban [FLOAT]
 	)
 
-	INSERT INTO #jawabanNumeric
-	SELECT
-		[JawabanNumeric].[idGroupJawaban],
-		[PertanyaanSurvei].[idPertanyaanSurvei],
-		[JawabanNumeric].[jawabanNumeric]
-	FROM
-		[JawabanNumeric]
-		RIGHT OUTER JOIN [PertanyaanSurvei]
-			ON [JawabanNumeric].[idPertanyaan] = [PertanyaanSurvei].[idPertanyaanSurvei]
-	WHERE 
-		[PertanyaanSurvei].[idSurvei] = @idSurvei
-		AND [PertanyaanSurvei].[tipeJawaban] = 'NUMERIC'
-		AND ([JawabanNumeric].[tombstone] = 1 OR [JawabanNumeric].[tombstone] iS NULL)
-
-	DECLARE cursorIdNumeric CURSOR
-	FOR
-		SELECT
-			DISTINCT(idPertanyaan)
-		FROM
-			#jawabanNumeric
-		ORDER BY
-			idPertanyaan
-	OPEN cursorIdNumeric
-
-	FETCH NEXT FROM 
-		cursorIdNumeric
-	INTO
-		@currIdPertanyaan
-
-	-- Ambil semua idPertanyaan sebagai nama untuk create global table numeric + tipe data
-	WHILE(@@FETCH_STATUS = 0)
-	BEGIN
-		SET @queryId = @queryId + ',[' + CAST(@currIdPertanyaan AS NVARCHAR)+']'
-		SET @queryType = @queryType + ',[' + CAST(@currIdPertanyaan AS NVARCHAR) +'] ' + 'FLOAT'
-
-		FETCH NEXT FROM 
-			cursorIdNumeric
-		INTO
-			@currIdPertanyaan
-	END
-
-	CLOSE cursorIdNumeric
-	DEALLOCATE cursorIdNumeric
-
-	IF(LEN(@queryId) > 0)
-	BEGIN
-		SET @queryId = SUBSTRING(@queryId, 2, LEN(@queryId))
-	END
-
-	IF(LEN(@queryType) > 0)
-	BEGIN
-		SET @queryType = SUBSTRING(@queryType, 2, LEN(@queryType))
-	END
-
-	SET @queryCreateTable = 'CREATE TABLE ##numericPivot_' + @guid + ' (idGroupJawaban INT,' + @queryType + ')'
-	SET @queryInsert = 'INSERT INTO ##numericPivot_' + @guid
-				+ ' SELECT idGroupJawaban,' + @queryId + ' FROM #jawabanNumeric' 
-				+ ' pivot(MAX(jawaban) FOR idPertanyaan IN (' + @queryId + ')) AS p'
-
-	/* Agregasi + Filter data numeric */
-	IF(@jsonFilter IS NOT NULL)
-	BEGIN
-		DECLARE cursorFilter CURSOR
-		FOR
-			SELECT 
-				[idPertanyaan],
-				[filter]
-			FROM
-				@filter
-			WHERE
-				[tipeJawaban] = 'NUMERIC'
-		OPEN cursorFilter
-
-		FETCH NEXT FROM
-			cursorFilter
-		INTO
-			@currIdPertanyaan,
-			@currFilter
-
-		WHILE(@@FETCH_STATUS = 0)
-		BEGIN
-			SET @lowerBound = SUBSTRING(@currFilter, 0, CHARINDEX(',', @currFilter))
-			SET @upperBound = SUBSTRING(@currFilter, CHARINDEX(',', @currFilter)+1, LEN(@currFilter))
-			SET @queryFilter = @queryFilter + ' AND [' + CAST(@currIdPertanyaan AS NVARCHAR)+ ']'
-							+ '>=' + @lowerBound + ' AND [' + CAST(@currIdPertanyaan AS NVARCHAR)+ ']'
-							+ '<=' + @upperBound
-
-			FETCH NEXT FROM
-				cursorFilter
-			INTO
-				@currIdPertanyaan,
-				@currFilter
-		END
-
-		CLOSE cursorFilter
-		DEALLOCATE cursorFilter
-
-		IF(LEN(@queryFilter) > 0)
-		BEGIN
-			SET @queryFilter = SUBSTRING(@queryFilter, 5, LEN(@queryFilter))
-			SET @queryInsert = @queryInsert + ' WHERE ' + @queryFilter
-		END
-	END
-
-	EXEC SP_EXECUTESQL @queryCreateTable
-	EXEC SP_EXECUTESQL @queryInsert
-
-	--SET @query = 'SELECT * FROM ##numericPivot_' + @guid
-	--EXEC SP_EXECUTESQL @query
-
-	-- Pivot + Agregasi dan Filter semua jawaban date
 	CREATE TABLE #jawabanDate
 	(
 		idGroupJawaban [INT],
@@ -199,122 +59,6 @@ AS
 		jawaban [DATE]
 	)
 
-	INSERT INTO #jawabanDate
-	SELECT
-		[JawabanDate].[idGroupJawaban],
-		[PertanyaanSurvei].[idPertanyaanSurvei],
-		[JawabanDate].[jawabanDate]
-	FROM
-		[JawabanDate]
-		RIGHT OUTER JOIN [PertanyaanSurvei]
-			ON [JawabanDate].[idPertanyaan] = [PertanyaanSurvei].[idPertanyaanSurvei]
-	WHERE 
-		[PertanyaanSurvei].[idSurvei] = @idSurvei
-		AND [PertanyaanSurvei].[tipeJawaban] = 'DATE'
-		AND ([JawabanDate].[tombstone] = 1 OR [JawabanDate].[tombstone] iS NULL)
-
-	SET @queryId = ''
-	SET @queryType = ''
-
-	DECLARE cursorIdDate CURSOR
-	FOR
-		SELECT
-			DISTINCT(idPertanyaan)
-		FROM
-			#jawabanDate
-		ORDER BY
-			idPertanyaan
-	OPEN cursorIdDate
-
-	FETCH NEXT FROM 
-		cursorIdDate
-	INTO
-		@currIdPertanyaan
-
-	-- Ambil semua idPertanyaan sebagai nama untuk create global table date + tipe data
-	WHILE(@@FETCH_STATUS = 0)
-	BEGIN
-		SET @queryId = @queryId + ',[' + CAST(@currIdPertanyaan AS NVARCHAR)+']'
-		SET @queryType = @queryType + ',[' + CAST(@currIdPertanyaan AS NVARCHAR) +'] ' + 'DATE'
-
-		FETCH NEXT FROM 
-			cursorIdDate
-		INTO
-			@currIdPertanyaan
-	END
-
-	CLOSE cursorIdDate
-	DEALLOCATE cursorIdDate
-
-	IF(LEN(@queryId) > 0)
-	BEGIN
-		SET @queryId = SUBSTRING(@queryId, 2, LEN(@queryId))
-	END
-
-	IF(LEN(@queryType) > 0)
-	BEGIN
-		SET @queryType = SUBSTRING(@queryType, 2, LEN(@queryType))
-	END
-
-	SET @queryCreateTable = 'CREATE TABLE ##datePivot_' + @guid + ' (idGroupJawaban INT,' + @queryType + ')'
-	SET @queryInsert = 'INSERT INTO ##datePivot_' + @guid
-				+ ' SELECT idGroupJawaban,' + @queryId + ' FROM #jawabanDate' 
-				+ ' pivot(MAX(jawaban) FOR idPertanyaan IN (' + @queryId + ')) AS p'
-
-	/* Agregasi + Filter data date */
-	SET @queryFilter = ''
-
-	IF(@jsonFilter IS NOT NULL)
-	BEGIN
-		DECLARE cursorFilter CURSOR
-		FOR
-			SELECT 
-				[idPertanyaan],
-				[filter]
-			FROM
-				@filter
-			WHERE
-				[tipeJawaban] = 'DATE'
-		OPEN cursorFilter
-
-		FETCH NEXT FROM
-			cursorFilter
-		INTO
-			@currIdPertanyaan,
-			@currFilter
-
-		WHILE(@@FETCH_STATUS = 0)
-		BEGIN
-			SET @lowerBound = SUBSTRING(@currFilter, 0, CHARINDEX(',', @currFilter))
-			SET @upperBound = SUBSTRING(@currFilter, CHARINDEX(',', @currFilter)+1, LEN(@currFilter))
-			SET @queryFilter = @queryFilter + ' AND [' + CAST(@currIdPertanyaan AS NVARCHAR)+ ']'
-							+ '>=''' + @lowerBound + ''' AND [' + CAST(@currIdPertanyaan AS NVARCHAR)+ ']'
-							+ '<=''' + @upperBound + ''''
-
-			FETCH NEXT FROM
-				cursorFilter
-			INTO
-				@currIdPertanyaan,
-				@currFilter
-		END
-
-		CLOSE cursorFilter
-		DEALLOCATE cursorFilter
-
-		IF(LEN(@queryFilter) > 0)
-		BEGIN
-			SET @queryFilter = SUBSTRING(@queryFilter, 5, LEN(@queryFilter))
-			SET @queryInsert = @queryInsert + ' WHERE ' + @queryFilter
-		END
-	END
-
-	EXEC SP_EXECUTESQL @queryCreateTable
-	EXEC SP_EXECUTESQL @queryInsert
-
-	--SET @query = 'SELECT * FROM ##datePivot_' + @guid
-	--EXEC SP_EXECUTESQL @query
-
-	-- Pivot + Agregasi dan Filter semua jawaban string
 	CREATE TABLE #jawabanString
 	(
 		idGroupJawaban [INT],
@@ -322,234 +66,474 @@ AS
 		jawaban [VARCHAR](300)
 	)
 
-	INSERT INTO #jawabanString
-	SELECT 
-		[JawabanString].[idGroupJawaban],
-		[PertanyaanSurvei].[idPertanyaanSurvei],
-		[JawabanString].[jawabanString]
-	FROM
-		[JawabanString]
-		RIGHT OUTER JOIN [PertanyaanSurvei]
-			ON [JawabanString].[idPertanyaan] = [PertanyaanSurvei].[idPertanyaanSurvei]
-	WHERE 
-		[PertanyaanSurvei].[idSurvei] = @idSurvei
-		AND [PertanyaanSurvei].[tipeJawaban] = 'STRING'
-		AND ([JawabanString].[tombstone] = 1 OR [JawabanString].[tombstone] iS NULL)
+	CREATE TABLE #tableIdPertanyaan
+	(
+		idPertanyaan [INT],
+		tipeJawaban [VARCHAR](10)
+	)
 
-	SET @queryId = ''
-	SET @queryType = ''
+	BEGIN TRANSACTION
+	BEGIN TRY
+		SET @guid = REPLACE(NEWID(), '-', '')
+		SET @queryDropTable = 'DROP TABLE 
+									##numericPivot_' + @guid
+									+ ', ##datePivot_' + @guid
+									+ ', ##stringPivot_' + @guid
 
-	DECLARE cursorIdString CURSOR
-	FOR
+		INSERT INTO @filter
 		SELECT
-			DISTINCT(idPertanyaan)
+			[idPertanyaan],
+			[filter],
+			[tipeJawaban]
 		FROM
-			#jawabanString
-		ORDER BY
-			idPertanyaan
-	OPEN cursorIdString
+			ParseFilter(@jsonFilter)
 
-	FETCH NEXT FROM 
-		cursorIdString
-	INTO
-		@currIdPertanyaan
+		INSERT INTO @agregat
+		SELECT
+			[idPertanyaan],
+			[agregat],
+			[tipeJawaban]
+		FROM
+			ParseAgregat(@jsonAgregat)
 
-	-- Ambil semua idPertanyaan sebagai nama untuk create global table sring + tipe data
-	WHILE(@@FETCH_STATUS = 0)
-	BEGIN
-		SET @queryId = @queryId + ',[' + CAST(@currIdPertanyaan AS NVARCHAR)+']'
-		SET @queryType = @queryType + ',[' + CAST(@currIdPertanyaan AS NVARCHAR) +'] ' + 'VARCHAR(300)'
+		/* Pivot jawaban numeric */
+		INSERT INTO #jawabanNumeric
+		SELECT
+			[JawabanNumeric].[idGroupJawaban],
+			[PertanyaanSurvei].[idPertanyaanSurvei],
+			[JawabanNumeric].[jawabanNumeric]
+		FROM
+			[JawabanNumeric]
+			RIGHT OUTER JOIN [PertanyaanSurvei]
+				ON [JawabanNumeric].[idPertanyaan] = [PertanyaanSurvei].[idPertanyaanSurvei]
+		WHERE 
+			[PertanyaanSurvei].[idSurvei] = @idSurvei
+			AND [PertanyaanSurvei].[tipeJawaban] = 'NUMERIC'
+			AND ([JawabanNumeric].[tombstone] = 1 OR [JawabanNumeric].[tombstone] iS NULL)
+
+		DECLARE cursorIdNumeric CURSOR
+		FOR
+			SELECT
+				DISTINCT(idPertanyaan)
+			FROM
+				#jawabanNumeric
+			ORDER BY
+				idPertanyaan
+		OPEN cursorIdNumeric
 
 		FETCH NEXT FROM 
-			cursorIdString
+			cursorIdNumeric
 		INTO
 			@currIdPertanyaan
-	END
 
-	CLOSE cursorIdString
-	DEALLOCATE cursorIdString
-
-	IF(LEN(@queryId) > 0)
-	BEGIN
-		SET @queryId = SUBSTRING(@queryId, 2, LEN(@queryId))
-	END
-
-	IF(LEN(@queryType) > 0)
-	BEGIN
-		SET @queryType = SUBSTRING(@queryType, 2, LEN(@queryType))
-	END
-
-	SET @queryCreateTable = 'CREATE TABLE ##stringPivot_' + @guid + ' (idGroupJawaban INT,' + @queryType + ')'
-	SET @queryInsert = 'INSERT INTO ##stringPivot_' + @guid
-				+ ' SELECT idGroupJawaban,' + @queryId + ' FROM #jawabanString' 
-				+ ' pivot(MAX(jawaban) FOR idPertanyaan IN (' + @queryId + ')) AS p'
-
-	/* Agregasi + Filter data string */
-	SET @queryFilter = ''
-
-	IF(@jsonFilter IS NOT NULL)
-	BEGIN
-		DECLARE cursorFilter CURSOR
-		FOR
-			SELECT 
-				[idPertanyaan],
-				[filter]
-			FROM
-				@filter
-			WHERE
-				[tipeJawaban] = 'STRING'
-		OPEN cursorFilter
-
-		FETCH NEXT FROM
-			cursorFilter
-		INTO
-			@currIdPertanyaan,
-			@currFilter
+		-- Ambil semua idPertanyaan sebagai nama kolom untuk create global table numeric (dan tipe data)
+		SET @queryId = ''
+		SET @queryType = ''
 
 		WHILE(@@FETCH_STATUS = 0)
 		BEGIN
-			SET @queryFilter = @queryFilter + ' AND [' + CAST(@currIdPertanyaan AS NVARCHAR)+ ']'
-							+ ' LIKE ''%' + @currFilter + '%'''
+			SET @queryId = @queryId + ',[' + CAST(@currIdPertanyaan AS NVARCHAR)+']'
+			SET @queryType = @queryType + ',[' + CAST(@currIdPertanyaan AS NVARCHAR) +'] ' + 'FLOAT'
+
+			FETCH NEXT FROM 
+				cursorIdNumeric
+			INTO
+				@currIdPertanyaan
+		END
+
+		CLOSE cursorIdNumeric
+		DEALLOCATE cursorIdNumeric
+
+		IF(LEN(@queryId) > 0)
+		BEGIN
+			SET @queryId = SUBSTRING(@queryId, 2, LEN(@queryId))
+		END
+
+		IF(LEN(@queryType) > 0)
+		BEGIN
+			SET @queryType = SUBSTRING(@queryType, 2, LEN(@queryType))
+		END
+
+		SET @queryCreateTable = 'CREATE TABLE ##numericPivot_' + @guid + ' (idGroupJawaban INT,' + @queryType + ')'
+		SET @queryInsert = 'INSERT INTO ##numericPivot_' + @guid
+					+ ' SELECT idGroupJawaban,' + @queryId 
+					+ ' FROM #jawabanNumeric' 
+					+ ' pivot(MAX(jawaban) FOR idPertanyaan IN (' + @queryId + ')) AS p'
+
+		/* Filter data numeric */
+		IF(@jsonFilter IS NOT NULL)
+		BEGIN
+			SET @queryFilter = ''
+
+			DECLARE cursorFilter CURSOR
+			FOR
+				SELECT 
+					[idPertanyaan],
+					[filter]
+				FROM
+					@filter
+				WHERE
+					[tipeJawaban] = 'NUMERIC'
+			OPEN cursorFilter
 
 			FETCH NEXT FROM
 				cursorFilter
 			INTO
 				@currIdPertanyaan,
 				@currFilter
+
+			WHILE(@@FETCH_STATUS = 0)
+			BEGIN
+				SET @lowerBound = SUBSTRING(@currFilter, 0, CHARINDEX(',', @currFilter))
+				SET @upperBound = SUBSTRING(@currFilter, CHARINDEX(',', @currFilter)+1, LEN(@currFilter))
+				SET @queryFilter = @queryFilter 
+								+ ' AND [' + CAST(@currIdPertanyaan AS NVARCHAR)+ ']' + '>=' + @lowerBound 
+								+ ' AND [' + CAST(@currIdPertanyaan AS NVARCHAR)+ ']' + '<=' + @upperBound
+
+				FETCH NEXT FROM
+					cursorFilter
+				INTO
+					@currIdPertanyaan,
+					@currFilter
+			END
+
+			CLOSE cursorFilter
+			DEALLOCATE cursorFilter
+
+			IF(LEN(@queryFilter) > 0)
+			BEGIN
+				SET @queryFilter = SUBSTRING(@queryFilter, 5, LEN(@queryFilter))
+				SET @queryInsert = @queryInsert + ' WHERE ' + @queryFilter
+			END
 		END
 
-		CLOSE cursorFilter
-		DEALLOCATE cursorFilter
+		EXEC SP_EXECUTESQL @queryCreateTable
+		EXEC SP_EXECUTESQL @queryInsert
 
-		IF(LEN(@queryFilter) > 0)
-		BEGIN
-			SET @queryFilter = SUBSTRING(@queryFilter, 5, LEN(@queryFilter))
-			SET @queryInsert = @queryInsert + ' WHERE ' + @queryFilter
-		END
-	END
+		/* DEBUG */
+		--SET @query = 'SELECT * FROM ##numericPivot_' + @guid
+		--EXEC SP_EXECUTESQL @query
 
-	EXEC SP_EXECUTESQL @queryCreateTable
-	EXEC SP_EXECUTESQL @queryInsert
-
-	--SET @query = 'SELECT * FROM ##stringPivot_' + @guid
-	--EXEC SP_EXECUTESQL @query
-
-	/* 
-		Di titik ini sudah dapat semua jawaban yang sudah dan filter,
-		tinggal agregasi dan digabung ke 1 tabel dengan join.
-
-		Tapi di SELECT statementnya perlu tau semua idPertanyaan untuk diurutkan.
-	*/
-	IF(@jsonAgregat IS NULL)
-	BEGIN
-		CREATE TABLE #tableIdPertanyaan
-		(
-			idPertanyaan [INT],
-			tipeJawaban [VARCHAR](10)
-		)
-
-		INSERT INTO #tableIdPertanyaan
-		SELECT 
-			result.idPertanyaan,
-			PertanyaanSurvei.tipeJawaban
+		/* Pivot jawaban date */
+		INSERT INTO #jawabanDate
+		SELECT
+			[JawabanDate].[idGroupJawaban],
+			[PertanyaanSurvei].[idPertanyaanSurvei],
+			[JawabanDate].[jawabanDate]
 		FROM
-			(
-				SELECT DISTINCT(idPertanyaan) FROM #jawabanNumeric
-				UNION
-				SELECT DISTINCT(idPertanyaan) FROM #jawabanDate
-				UNION
-				SELECT DISTINCT(idPertanyaan) FROM #jawabanString
-			)as result
-			INNER JOIN [PertanyaanSurvei]
-				ON result.idPertanyaan = PertanyaanSurvei.idPertanyaanSurvei
+			[JawabanDate]
+			RIGHT OUTER JOIN [PertanyaanSurvei]
+				ON [JawabanDate].[idPertanyaan] = [PertanyaanSurvei].[idPertanyaanSurvei]
+		WHERE 
+			[PertanyaanSurvei].[idSurvei] = @idSurvei
+			AND [PertanyaanSurvei].[tipeJawaban] = 'DATE'
+			AND ([JawabanDate].[tombstone] = 1 OR [JawabanDate].[tombstone] iS NULL)
 
-		DECLARE cursorIdPertanyaan CURSOR
+		DECLARE cursorIdDate CURSOR
 		FOR
 			SELECT
-				idPertanyaan,
-				tipeJawaban
+				DISTINCT(idPertanyaan)
 			FROM
-				#tableIdPertanyaan
+				#jawabanDate
 			ORDER BY
 				idPertanyaan
-		OPEN cursorIdPertanyaan
+		OPEN cursorIdDate
 
 		FETCH NEXT FROM 
-			cursorIdPertanyaan
+			cursorIdDate
 		INTO
-			@currIdPertanyaan,
-			@currTipeJawaban
+			@currIdPertanyaan
 
-		-- Ambil semua idPertanyaan untuk di SELECT
+		-- Ambil semua idPertanyaan sebagai nama kolom untuk create global table date (dan tipe data)
+		SET @queryId = ''
+		SET @queryType = ''
+
 		WHILE(@@FETCH_STATUS = 0)
 		BEGIN
-			IF(@currTipeJawaban = 'NUMERIC')
+			SET @queryId = @queryId + ',[' + CAST(@currIdPertanyaan AS NVARCHAR)+']'
+			SET @queryType = @queryType + ',[' + CAST(@currIdPertanyaan AS NVARCHAR) +'] ' + 'DATE'
+
+			FETCH NEXT FROM 
+				cursorIdDate
+			INTO
+				@currIdPertanyaan
+		END
+
+		CLOSE cursorIdDate
+		DEALLOCATE cursorIdDate
+
+		IF(LEN(@queryId) > 0)
+		BEGIN
+			SET @queryId = SUBSTRING(@queryId, 2, LEN(@queryId))
+		END
+
+		IF(LEN(@queryType) > 0)
+		BEGIN
+			SET @queryType = SUBSTRING(@queryType, 2, LEN(@queryType))
+		END
+
+		SET @queryCreateTable = 'CREATE TABLE ##datePivot_' + @guid + ' (idGroupJawaban INT,' + @queryType + ')'
+		SET @queryInsert = 'INSERT INTO ##datePivot_' + @guid
+					+ ' SELECT idGroupJawaban,' + @queryId 
+					+ ' FROM #jawabanDate' 
+					+ ' pivot(MAX(jawaban) FOR idPertanyaan IN (' + @queryId + ')) AS p'
+
+		/* Filter data date */
+		IF(@jsonFilter IS NOT NULL)
+		BEGIN
+			SET @queryFilter = ''
+
+			DECLARE cursorFilter CURSOR
+			FOR
+				SELECT 
+					[idPertanyaan],
+					[filter]
+				FROM
+					@filter
+				WHERE
+					[tipeJawaban] = 'DATE'
+			OPEN cursorFilter
+
+			FETCH NEXT FROM
+				cursorFilter
+			INTO
+				@currIdPertanyaan,
+				@currFilter
+
+			WHILE(@@FETCH_STATUS = 0)
 			BEGIN
-				SET @querySelect = @querySelect + ',n.[' + CAST(@currIdPertanyaan AS VARCHAR) + ']'
+				SET @lowerBound = SUBSTRING(@currFilter, 0, CHARINDEX(',', @currFilter))
+				SET @upperBound = SUBSTRING(@currFilter, CHARINDEX(',', @currFilter)+1, LEN(@currFilter))
+				SET @queryFilter = @queryFilter 
+								+ ' AND [' + CAST(@currIdPertanyaan AS NVARCHAR)+ ']' + '>=''' + @lowerBound + '''' 
+								+ ' AND [' + CAST(@currIdPertanyaan AS NVARCHAR)+ ']' + '<=''' + @upperBound + ''''
+
+				FETCH NEXT FROM
+					cursorFilter
+				INTO
+					@currIdPertanyaan,
+					@currFilter
 			END
-			ELSE IF(@currTipeJawaban = 'DATE')
+
+			CLOSE cursorFilter
+			DEALLOCATE cursorFilter
+
+			IF(LEN(@queryFilter) > 0)
 			BEGIN
-				SET @querySelect = @querySelect + ',d.[' + CAST(@currIdPertanyaan AS VARCHAR) + ']'
+				SET @queryFilter = SUBSTRING(@queryFilter, 5, LEN(@queryFilter))
+				SET @queryInsert = @queryInsert + ' WHERE ' + @queryFilter
 			END
-			ELSE
+		END
+
+		EXEC SP_EXECUTESQL @queryCreateTable
+		EXEC SP_EXECUTESQL @queryInsert
+
+		/* DEBUG */
+		--SET @query = 'SELECT * FROM ##datePivot_' + @guid
+		--EXEC SP_EXECUTESQL @query
+
+		/* Pivot jawaban string */
+		INSERT INTO #jawabanString
+		SELECT 
+			[JawabanString].[idGroupJawaban],
+			[PertanyaanSurvei].[idPertanyaanSurvei],
+			[JawabanString].[jawabanString]
+		FROM
+			[JawabanString]
+			RIGHT OUTER JOIN [PertanyaanSurvei]
+				ON [JawabanString].[idPertanyaan] = [PertanyaanSurvei].[idPertanyaanSurvei]
+		WHERE 
+			[PertanyaanSurvei].[idSurvei] = @idSurvei
+			AND [PertanyaanSurvei].[tipeJawaban] = 'STRING'
+			AND ([JawabanString].[tombstone] = 1 OR [JawabanString].[tombstone] iS NULL)
+
+		DECLARE cursorIdString CURSOR
+		FOR
+			SELECT
+				DISTINCT(idPertanyaan)
+			FROM
+				#jawabanString
+			ORDER BY
+				idPertanyaan
+		OPEN cursorIdString
+
+		FETCH NEXT FROM 
+			cursorIdString
+		INTO
+			@currIdPertanyaan
+
+		-- Ambil semua idPertanyaan sebagai nama kolom untuk create global table string (dan tipe data)
+		SET @queryId = ''
+		SET @queryType = ''
+
+		WHILE(@@FETCH_STATUS = 0)
+		BEGIN
+			SET @queryId = @queryId + ',[' + CAST(@currIdPertanyaan AS NVARCHAR)+']'
+			SET @queryType = @queryType + ',[' + CAST(@currIdPertanyaan AS NVARCHAR) +'] ' + 'VARCHAR(300)'
+
+			FETCH NEXT FROM 
+				cursorIdString
+			INTO
+				@currIdPertanyaan
+		END
+
+		CLOSE cursorIdString
+		DEALLOCATE cursorIdString
+
+		IF(LEN(@queryId) > 0)
+		BEGIN
+			SET @queryId = SUBSTRING(@queryId, 2, LEN(@queryId))
+		END
+
+		IF(LEN(@queryType) > 0)
+		BEGIN
+			SET @queryType = SUBSTRING(@queryType, 2, LEN(@queryType))
+		END
+
+		SET @queryCreateTable = 'CREATE TABLE ##stringPivot_' + @guid + ' (idGroupJawaban INT,' + @queryType + ')'
+		SET @queryInsert = 'INSERT INTO ##stringPivot_' + @guid
+					+ ' SELECT idGroupJawaban,' + @queryId 
+					+ ' FROM #jawabanString' 
+					+ ' pivot(MAX(jawaban) FOR idPertanyaan IN (' + @queryId + ')) AS p'
+
+		/* Filter data string */
+		IF(@jsonFilter IS NOT NULL)
+		BEGIN
+			SET @queryFilter = ''
+
+			DECLARE cursorFilter CURSOR
+			FOR
+				SELECT 
+					[idPertanyaan],
+					[filter]
+				FROM
+					@filter
+				WHERE
+					[tipeJawaban] = 'STRING'
+			OPEN cursorFilter
+
+			FETCH NEXT FROM
+				cursorFilter
+			INTO
+				@currIdPertanyaan,
+				@currFilter
+
+			WHILE(@@FETCH_STATUS = 0)
 			BEGIN
-				SET @querySelect = @querySelect + ',s.[' + CAST(@currIdPertanyaan AS VARCHAR) + ']'
+				SET @queryFilter = @queryFilter 
+								+ ' AND [' + CAST(@currIdPertanyaan AS NVARCHAR)+ ']'
+								+ ' LIKE ''%' + @currFilter + '%'''
+
+				FETCH NEXT FROM
+					cursorFilter
+				INTO
+					@currIdPertanyaan,
+					@currFilter
 			END
+
+			CLOSE cursorFilter
+			DEALLOCATE cursorFilter
+
+			IF(LEN(@queryFilter) > 0)
+			BEGIN
+				SET @queryFilter = SUBSTRING(@queryFilter, 5, LEN(@queryFilter))
+				SET @queryInsert = @queryInsert + ' WHERE ' + @queryFilter
+			END
+		END
+
+		EXEC SP_EXECUTESQL @queryCreateTable
+		EXEC SP_EXECUTESQL @queryInsert
+
+		/* DEBUG */
+		--SET @query = 'SELECT * FROM ##stringPivot_' + @guid
+		--EXEC SP_EXECUTESQL @query
+
+		/* 
+			Di titik ini sudah dapat semua jawaban yang sudah dan filter,
+			tinggal agregasi dan digabung ke 1 tabel dengan join.
+
+			SELECT statementnya perlu tau semua idPertanyaan untuk diurutkan.
+		*/
+		IF(@jsonAgregat IS NULL)
+		BEGIN
+			INSERT INTO #tableIdPertanyaan
+			SELECT 
+				[result].[idPertanyaan],
+				[PertanyaanSurvei].[tipeJawaban]
+			FROM
+				(
+					SELECT DISTINCT([idPertanyaan]) FROM #jawabanNumeric
+					UNION SELECT DISTINCT([idPertanyaan]) FROM #jawabanDate
+					UNION SELECT DISTINCT([idPertanyaan]) FROM #jawabanString
+				)as result
+				INNER JOIN [PertanyaanSurvei]
+					ON [result].[idPertanyaan] = [PertanyaanSurvei].[idPertanyaanSurvei]
+
+			DECLARE cursorIdPertanyaan CURSOR
+			FOR
+				SELECT
+					idPertanyaan,
+					tipeJawaban
+				FROM
+					#tableIdPertanyaan
+				ORDER BY
+					idPertanyaan
+			OPEN cursorIdPertanyaan
 
 			FETCH NEXT FROM 
 				cursorIdPertanyaan
 			INTO
 				@currIdPertanyaan,
 				@currTipeJawaban
+
+			-- Ambil semua idPertanyaan untuk di SELECT
+			SET @querySelect = ''
+
+			WHILE(@@FETCH_STATUS = 0)
+			BEGIN
+				IF(@currTipeJawaban = 'NUMERIC')
+				BEGIN
+					SET @querySelect = @querySelect + ',n.[' + CAST(@currIdPertanyaan AS VARCHAR) + ']'
+				END
+				ELSE IF(@currTipeJawaban = 'DATE')
+				BEGIN
+					SET @querySelect = @querySelect + ',d.[' + CAST(@currIdPertanyaan AS VARCHAR) + ']'
+				END
+				ELSE
+				BEGIN
+					SET @querySelect = @querySelect + ',s.[' + CAST(@currIdPertanyaan AS VARCHAR) + ']'
+				END
+
+				FETCH NEXT FROM 
+					cursorIdPertanyaan
+				INTO
+					@currIdPertanyaan,
+					@currTipeJawaban
+			END
+
+			CLOSE cursorIdPertanyaan
+			DEALLOCATE cursorIdPertanyaan
+
+			IF(LEN(@querySelect) > 0)
+			BEGIN
+				SET @querySelect = SUBSTRING(@querySelect, 2, LEN(@querySelect))
+			END
+
+			SET @query = 'SELECT n.idGroupJawaban,' + @querySelect
 		END
-
-		CLOSE cursorIdPertanyaan
-		DEALLOCATE cursorIdPertanyaan
-
-		IF(LEN(@querySelect) > 0)
+		ELSE
 		BEGIN
-			SET @querySelect = SUBSTRING(@querySelect, 2, LEN(@querySelect))
-		END
+			SET @queryAgregat = ''
 
-		SET @query = 'SELECT n.idGroupJawaban,' + @querySelect
-			
-	END
-	ELSE
-	BEGIN
-		DECLARE cursorAgregat CURSOR
-		FOR
-			SELECT 
-				[idPertanyaan],
-				[agregat],
-				[tipeJawaban]
-			FROM
-				@agregat
-		OPEN cursorAgregat
-
-		FETCH NEXT FROM
-			cursorAgregat
-		INTO
-			@currIdPertanyaan,
-			@currAgregat,
-			@currTipeJawaban
-
-		WHILE(@@FETCH_STATUS = 0)
-		BEGIN
-			IF(@currTipeJawaban = 'NUMERIC')
-			BEGIN
-				SET @queryAgregat = @queryAgregat + ',' + @currAgregat + '(n.[' + CAST(@currIdPertanyaan AS VARCHAR) + '])'
-								+ 'AS [' + @currAgregat + ' (' + CAST(@currIdPertanyaan AS VARCHAR) + ')]' 
-			END
-			ELSE IF(@currTipeJawaban = 'DATE')
-			BEGIN
-				SET @queryAgregat = @queryAgregat + ',' + @currAgregat + '(d.[' + CAST(@currIdPertanyaan AS VARCHAR) + '])'
-								+ 'AS [' + @currAgregat + ' (' + CAST(@currIdPertanyaan AS VARCHAR) + ')]' 
-			END
-			ELSE
-			BEGIN
-				SET @queryAgregat = @queryAgregat + ',' + @currAgregat + '(s.[' + CAST(@currIdPertanyaan AS VARCHAR) + '])'
-								+ 'AS [' + @currAgregat + ' (' + CAST(@currIdPertanyaan AS VARCHAR) + ')]' 
-			END
+			DECLARE cursorAgregat CURSOR
+			FOR
+				SELECT 
+					[idPertanyaan],
+					[agregat],
+					[tipeJawaban]
+				FROM
+					@agregat
+			OPEN cursorAgregat
 
 			FETCH NEXT FROM
 				cursorAgregat
@@ -557,19 +541,56 @@ AS
 				@currIdPertanyaan,
 				@currAgregat,
 				@currTipeJawaban
+
+			WHILE(@@FETCH_STATUS = 0)
+			BEGIN
+				IF(@currTipeJawaban = 'NUMERIC')
+				BEGIN
+					SET @queryAgregat = @queryAgregat + ',' 
+									+ @currAgregat + '(n.[' + CAST(@currIdPertanyaan AS VARCHAR) + ']) '
+									+ 'AS [' + @currAgregat + ' (' + CAST(@currIdPertanyaan AS VARCHAR) + ')]' 
+				END
+				ELSE IF(@currTipeJawaban = 'DATE')
+				BEGIN
+					SET @queryAgregat = @queryAgregat + ',' 
+									+ @currAgregat + '(d.[' + CAST(@currIdPertanyaan AS VARCHAR) + ']) '
+									+ 'AS [' + @currAgregat + ' (' + CAST(@currIdPertanyaan AS VARCHAR) + ')]' 
+				END
+				ELSE
+				BEGIN
+					SET @queryAgregat = @queryAgregat + ',' 
+									+ @currAgregat + '(s.[' + CAST(@currIdPertanyaan AS VARCHAR) + ']) '
+									+ 'AS [' + @currAgregat + ' (' + CAST(@currIdPertanyaan AS VARCHAR) + ')]' 
+				END
+
+				FETCH NEXT FROM
+					cursorAgregat
+				INTO
+					@currIdPertanyaan,
+					@currAgregat,
+					@currTipeJawaban
+			END
+
+			CLOSE cursorAgregat
+			DEALLOCATE cursorAgregat
+
+			SET @queryAgregat = SUBSTRING(@queryAgregat, 2, LEN(@queryAgregat))
+			SET @query = 'SELECT ' + @queryAgregat
 		END
 
-		CLOSE cursorAgregat
-		DEALLOCATE cursorAgregat
+		SET @query = @query +
+					' FROM ##numericPivot_' + @guid +' n' +
+					' INNER JOIN ##datePivot_' + @guid + ' d ON n.idGroupJawaban=d.idGroupJawaban' +
+					' INNER JOIN ##stringPivot_' + @guid + ' s ON n.idGroupJawaban=s.idGroupJawaban'
+		
+		EXEC SP_EXECUTESQL @query
+		EXEC SP_EXECUTESQL @queryDropTable
 
-		SET @queryAgregat = SUBSTRING(@queryAgregat, 2, LEN(@queryAgregat))
-		SET @query = 'SELECT ' + @queryAgregat
-	END
+		COMMIT TRANSACTION
+	END TRY
+	BEGIN CATCH
+		SELECT
+			0
 
-	SET @query = @query +
-				' FROM ##numericPivot_' + @guid +' n' +
-				' INNER JOIN ##datePivot_' + @guid + ' d ON n.idGroupJawaban=d.idGroupJawaban' +
-				' INNER JOIN ##stringPivot_' + @guid + ' s ON n.idGroupJawaban=s.idGroupJawaban'
-	EXEC SP_EXECUTESQL @query
-
-	EXEC SP_EXECUTESQL @queryDropTable
+		ROLLBACK TRANSACTION
+	END CATCH

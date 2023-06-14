@@ -1,7 +1,7 @@
 ALTER PROCEDURE [UpdateUser]
+	@idUser [INT],
 	@newUsername [VARCHAR](20),
-	@newPassword [VARCHAR](20),
-	@idUser [INT]
+	@newPassword [VARCHAR](20)
 AS
 	DECLARE
 		@isSuccess [BIT]
@@ -16,18 +16,18 @@ AS
 		WHERE
 			[idUser] = @idUser
 
-		SET
-			@isSuccess = 1
+		SET @isSuccess = 1
 
 		SELECT
 			@isSuccess
-	COMMIT TRANSACTION
+
+		COMMIT TRANSACTION
 	END TRY
 	BEGIN CATCH
-		SET
-			@isSuccess = 0
+		SET @isSuccess = 0
 
 		SELECT
 			@isSuccess
-	ROLLBACK TRANSACTION
+
+		ROLLBACK TRANSACTION
 	END CATCH

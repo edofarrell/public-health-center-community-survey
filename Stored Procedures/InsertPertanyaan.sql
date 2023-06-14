@@ -1,3 +1,23 @@
+/* 
+	@jsonPertanyaan Format (JSON Array):
+	[
+		{
+			"pertanyaan":	[STRING],
+			"tipeJawaban":	[STRING]
+		},
+		{
+			"pertanyaan": 	[STRING],
+			"tipeJawaban":	[STRING]
+		}
+	]
+
+	Output Format:
+	pertanyaan		tipeJawaban
+	[VARCHAR](150)	[VARCHAR](10)
+
+	"tipeJawaban" field: "NUMERIC", "DATE", "STRING"
+*/
+
 ALTER PROCEDURE [InsertPertanyaan]
 	@idSurvei [INT],
 	@jsonPertanyaan [NVARCHAR](2150)
@@ -54,18 +74,18 @@ AS
 		CLOSE cursorPertanyaan
 		DEALLOCATE cursorPertanyaan
 
-		SET
-			@isSuccess = 1
+		SET @isSuccess = 1
 
 		SELECT
 			@isSuccess
-	COMMIT TRANSACTION
+
+		COMMIT TRANSACTION
 	END TRY
 	BEGIN CATCH
-		SET
-			@isSuccess = 0
+		SET @isSuccess = 0
 
 		SELECT
 			@isSuccess
-	ROLLBACK TRANSACTION
+
+		ROLLBACK TRANSACTION
 	END CATCH

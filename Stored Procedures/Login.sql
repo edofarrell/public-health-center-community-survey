@@ -3,21 +3,38 @@ ALTER PROCEDURE [Login]
 	@password [VARCHAR](20)
 AS
 	DECLARE 
-		@isSuccess [BIT]
+		@isSuccess [BIT],
+		@idUserCounter [INT]
 
-	SET 
-		@isSuccess = 0
+	BEGIN TRANSACTION
+	BEGIN TRY
+		SELECT
+			@idUserCounter = COUNT([idUser])
+		FROM
+			[User]
+		WHERE
+			[username] = @username
+			AND [password] = @password
+		
+		IF(@idUserCounter <> 0)
+		BEGIN
+			SET @isSuccess = 1
+		END
+		ELSE
+		BEGIN
+			SET @isSuccess = 0
+		END
 
-	SELECT
-		[idUser]
-	FROM
-		[User]
-	WHERE
-		[username] = @username
-		AND [password] = @password
+		SELECT
+			@isSuccess
 
-	SET 
-		@isSuccess = 1
+		COMMIT TRANSACTION
+	END TRY
+	BEGIN CATCH
+		SET @isSuccess = 0
 
-	SELECT 
-		@isSuccess
+		SELECT
+			@isSuccess
+
+		ROLLBACK TRANSACTION
+	END CATCH

@@ -13,19 +13,18 @@ AS
 		VALUES
 			(@username, @password, @idRole)
 
-		SET
-			@isSuccess = 1
+		SET @isSuccess = 1
 
 		SELECT
 			@isSuccess
-	COMMIT TRANSACTION
+
+		COMMIT TRANSACTION
 	END TRY
 	BEGIN CATCH
-		SET
-			@isSuccess = 0
+		SET @isSuccess = 0
 
 		SELECT
 			@isSuccess
-	ROLLBACK TRANSACTION
+
+		ROLLBACK TRANSACTION
 	END CATCH
-	

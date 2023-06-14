@@ -2,22 +2,20 @@
 	Input Format (JSON Array):
 	[
 		{
-			"idPertanyaan": 1,
-			"agregat": "SUM"
+			"idPertanyaan": [NUMBER],
+			"agregat": [STRING]
 		},
 		{
-			"idPertanyaan": 2,
-			"agregat": "AVG"
-		},
-		{
-			"idPertanyaan": 3,
-			"agregat": "COUNT"
+			"idPertanyaan": [NUMBER],
+			"agregat": [STRING]
 		}
 	]
 
 	Output Format:
 	idPertanyaan	filter			tipeJawaban
 	[INT]			[VARCHAR](10)	[VARCHAR](10)
+
+	"agregat" field: "SUM", "MIN", "MAX", "AVG", "COUNT"
 */
 
 ALTER FUNCTION [ParseAgregat]
@@ -52,8 +50,8 @@ BEGIN
 	BEGIN
 		INSERT INTO @result
 		SELECT
-			[j].[idPertanyaan],
-			[j].[agregat],
+			[J].[idPertanyaan],
+			[J].[agregat],
 			[PertanyaanSurvei].[tipeJawaban]
 		FROM
 			[PertanyaanSurvei]
@@ -63,7 +61,7 @@ BEGIN
 					[idPertanyaan] [INT] '$.idPertanyaan',
 					[agregat] [VARCHAR](30) '$.agregat'
 				) J
-				ON J.[idPertanyaan] = [PertanyaanSurvei].[idPertanyaanSurvei] 
+				ON [J].[idPertanyaan] = [PertanyaanSurvei].[idPertanyaanSurvei] 
 
 		FETCH NEXT FROM
 			cursorAgregat

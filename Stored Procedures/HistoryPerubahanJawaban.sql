@@ -1,7 +1,8 @@
-ALTER PROCEDURE [HistoryJawaban]
+ALTER PROCEDURE [GetHistoryGroupJawaban]
 	@idGroupJawaban [INT]
 AS
-	DECLARE @result TABLE(
+	DECLARE @result TABLE
+	(
 		[jawaban] [VARCHAR](100),
 		[timestamp] [DATETIME],
 		[tombstone] [BIT],
@@ -11,8 +12,7 @@ AS
 
 	BEGIN TRANSACTION
 	BEGIN TRY
-		INSERT INTO 
-			@result
+		INSERT INTO @result
 		SELECT
 			CONVERT([VARCHAR],[JawabanDate].[jawabanDate]),
 			[JawabanDate].[timestamp],
@@ -24,8 +24,7 @@ AS
 		WHERE
 			[JawabanDate].[idGroupJawaban] = @idGroupJawaban
 
-		INSERT INTO 
-			@result
+		INSERT INTO @result
 		SELECT
 			CONVERT([VARCHAR],[JawabanNumeric].[jawabanNumeric]),
 			[JawabanNumeric].[timestamp],
@@ -58,11 +57,14 @@ AS
 		FROM
 			@result
 		ORDER BY
+			[@result].[timestamp],
 			[@result].[idPertanyaan]
-	COMMIT TRANSACTION
+
+		COMMIT TRANSACTION
 	END TRY
 	BEGIN CATCH
 		SELECT
 			0
-	ROLLBACK TRANSACTION
+	
+		ROLLBACK TRANSACTION
 	END CATCH
