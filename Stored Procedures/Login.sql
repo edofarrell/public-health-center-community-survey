@@ -3,19 +3,18 @@ ALTER PROCEDURE [Login]
 	@password [VARCHAR](20)
 AS
 	DECLARE 
-		@passDB [VARCHAR](20),
 		@isSuccess [BIT]
 
 	SET 
 		@isSuccess = 0
 
 	SELECT
-		@passDB = [password]
+		
 	FROM
 		[User]
 	WHERE
 		[username] = @username
-		AND @passDB = @password
+		AND [password] = @password
 
 	SET 
 		@isSuccess = 1
