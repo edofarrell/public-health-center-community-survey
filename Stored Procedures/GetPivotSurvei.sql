@@ -586,6 +586,15 @@ AS
 		EXEC SP_EXECUTESQL @query
 		EXEC SP_EXECUTESQL @queryDropTable
 
+		/* Print pertanyaan untuk setiap idPertanyaan */
+		SELECT
+			[idPertanyaanSurvei],
+			[pertanyaan]
+		FROM
+			[PertanyaanSurvei]
+		WHERE
+			[idSurvei] = @idSurvei
+
 		COMMIT TRANSACTION
 	END TRY
 	BEGIN CATCH
