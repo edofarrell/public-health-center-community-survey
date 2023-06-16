@@ -1,5 +1,4 @@
 ALTER PROCEDURE [GetGroupJawaban]
-	@idUser [INT],
 	@idSurvei [INT],
 	@waktuAwal [DATETIME],
 	@waktuAkhir [DATETIME]
