@@ -1,56 +1,92 @@
+/*
+	@strIdPertanyaan format:
+	"[INT],[INT],[INT]"
+*/
+
 ALTER PROCEDURE [DeleteJawaban]
 	@idGroupJawaban [INT],
-	@idPertanyaan [INT]
+	@strIdPertanyaan [VARCHAR](20)
 AS
 	DECLARE
-		@tipeJawaban [VARCHAR](10),
+		@currTipeJawaban [VARCHAR](10),
+		@currIdPertanyaan [INT],
 		@isSuccess [BIT]
+
+	DECLARE @tableIdPertanyaan TABLE
+	(
+		[idPertanyaan] [INT]
+	)
 
 	BEGIN TRANSACTION
 	BEGIN TRY
+		INSERT INTO @tableIdPertanyaan
 		SELECT
-			@tipeJawaban = [PertanyaanSurvei].[tipeJawaban]
+			CAST([value] AS [INT])
 		FROM
-			[GroupJawaban]
-			INNER JOIN [PertanyaanSurvei]
-				ON [GroupJawaban].[idSurvei] = [PertanyaanSurvei].[idSurvei]
-		WHERE
-			[GroupJawaban].[idGroupJawaban] = @idGroupJawaban
-			AND [PertanyaanSurvei].[idPertanyaanSurvei] = @idPertanyaan
+			STRING_SPLIT(@strIdPertanyaan, ',')
 
-		IF(@tipeJawaban = 'NUMERIC')
+		DECLARE cursorIdPertanyaan CURSOR
+		FOR
+			SELECT
+				[@tableIdPertanyaan].[idPertanyaan],
+				[PertanyaanSurvei].[tipeJawaban]
+			FROM 
+				[PertanyaanSurvei]
+				INNER JOIN @tableIdPertanyaan
+					ON [@tableIdPertanyaan].[idPertanyaan] = [PertanyaanSurvei].[idPertanyaanSurvei]
+		OPEN cursorIdPertanyaan
+
+		FETCH NEXT FROM
+			cursorIdPertanyaan
+		INTO
+			@currIdPertanyaan,
+			@currTipeJawaban
+
+		WHILE(@@FETCH_STATUS = 0)
 		BEGIN
-			UPDATE 
-				[JawabanNumeric]
-			SET
-				[tombstone] = 0
-			WHERE
-				[JawabanNumeric].[idGroupJawaban] = @idGroupJawaban
-				AND [JawabanNumeric].[idPertanyaan] = @idPertanyaan
-				AND [JawabanNumeric].[tombstone] = 1
+			IF(@currTipeJawaban = 'NUMERIC')
+			BEGIN
+				UPDATE 
+					[JawabanNumeric]
+				SET
+					[tombstone] = 0
+				WHERE
+					[JawabanNumeric].[idGroupJawaban] = @idGroupJawaban
+					AND [JawabanNumeric].[idPertanyaan] = @currIdPertanyaan
+					AND [JawabanNumeric].[tombstone] = 1
+			END
+			ELSE IF(@currTipeJawaban = 'DATE')
+			BEGIN
+				UPDATE 
+					[JawabanDate]
+				SET
+					[tombstone] = 0
+				WHERE
+					[JawabanDate].[idGroupJawaban] = @idGroupJawaban
+					AND [JawabanDate].[idPertanyaan] = @currIdPertanyaan
+					AND [JawabanDate].[tombstone] = 1
+			END
+			ELSE
+			BEGIN
+				UPDATE 
+					[JawabanString]
+				SET
+					[tombstone] = 0
+				WHERE
+					[JawabanString].[idGroupJawaban] = @idGroupJawaban
+					AND [JawabanString].[idPertanyaan] = @currIdPertanyaan
+					AND [JawabanString].[tombstone] = 1
+			END
+			
+			FETCH NEXT FROM
+				cursorIdPertanyaan
+			INTO
+				@currIdPertanyaan,
+				@currTipeJawaban
 		END
-		ELSE IF(@tipeJawaban = 'DATE')
-		BEGIN
-			UPDATE 
-				[JawabanDate]
-			SET
-				[tombstone] = 0
-			WHERE
-				[JawabanDate].[idGroupJawaban] = @idGroupJawaban
-				AND [JawabanDate].[idPertanyaan] = @idPertanyaan
-				AND [JawabanDate].[tombstone] = 1
-		END
-		ELSE
-		BEGIN
-			UPDATE 
-				[JawabanString]
-			SET
-				[tombstone] = 0
-			WHERE
-				[JawabanString].[idGroupJawaban] = @idGroupJawaban
-				AND [JawabanString].[idPertanyaan] = @idPertanyaan
-				AND [JawabanString].[tombstone] = 1
-		END
+
+		CLOSE cursorIdPertanyaan
+		DEALLOCATE cursorIdPertanyaan
 
 		SET @isSuccess = 1
 
