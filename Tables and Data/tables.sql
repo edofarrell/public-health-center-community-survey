@@ -61,7 +61,7 @@ CREATE TABLE [dbo].[PertanyaanSurvei]
 
 CREATE TABLE [dbo].[JawabanDate]
 (
-	[idJawabanDate] [INT] PRIMARY KEY IDENTITY(1,1) NOT NULL,
+	[idJawabanDate] [INT] PRIMARY KEY NONCLUSTERED IDENTITY(1,1) NOT NULL,
 	[jawabanDate] [DATETIME] NOT NULL,
 	[timestamp] [DATETIME] NOT NULL,
 	[tombstone] [BIT] NOT NULL,
@@ -69,10 +69,11 @@ CREATE TABLE [dbo].[JawabanDate]
 	[idGroupJawaban] [INT] NOT NULL, --FK GroupJawaban([idGroupJawaban])
 	[idUser] [INT] NOT NULL --FK User([idUser])
 )
+CREATE CLUSTERED INDEX idxIdPertanyaan ON [JawabanDate](idPertanyaan)
 
 CREATE TABLE [dbo].[JawabanNumeric]
 (
-	[idJawabanNumeric] [INT] PRIMARY KEY IDENTITY(1,1) NOT NULL,
+	[idJawabanNumeric] [INT] PRIMARY KEY NONCLUSTERED IDENTITY(1,1) NOT NULL,
 	[jawabanNumeric] [FLOAT] NOT NULL,
 	[timestamp] [DATETIME] NOT NULL,
 	[tombstone] [BIT] NOT NULL,
@@ -80,10 +81,11 @@ CREATE TABLE [dbo].[JawabanNumeric]
 	[idGroupJawaban] [INT] NOT NULL, --FK GroupJawaban([idGroupJawaban])
 	[idUser] [INT] NOT NULL --FK User([idUser])
 )	
+CREATE CLUSTERED INDEX idxIdPertanyaan ON [JawabanNumeric](idPertanyaan)
 
 CREATE TABLE [dbo].[JawabanString]
 (
-	[idJawabanString] [INT] PRIMARY KEY IDENTITY(1,1) NOT NULL,
+	[idJawabanString] [INT] PRIMARY KEY NONCLUSTERED IDENTITY(1,1) NOT NULL,
 	[jawabanString] [VARCHAR](300) NOT NULL,
 	[timestamp] [DATETIME] NOT NULL,
 	[tombstone] [BIT] NOT NULL,
@@ -91,3 +93,4 @@ CREATE TABLE [dbo].[JawabanString]
 	[idGroupJawaban] [INT] NOT NULL, --FK GroupJawaban([idGroupJawaban])
 	[idUser] [INT] NOT NULL --FK User([idUser])
 )
+CREATE CLUSTERED INDEX idxIdPertanyaan ON [JawabanString](idPertanyaan)
