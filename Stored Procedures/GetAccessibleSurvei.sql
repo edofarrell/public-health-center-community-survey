@@ -1,4 +1,4 @@
-ALTER PROCEDURE [GetSurvei]
+ALTER PROCEDURE [GetAccessibleSurvei]
 	@idUser [INT]
 AS
 	BEGIN TRANSACTION
