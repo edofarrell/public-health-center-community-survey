@@ -5,9 +5,12 @@ AS
 	BEGIN TRY
 		SELECT
 			[User].[Username],
-			[User].[Password]
+			[User].[Password],
+			[Role].[namaRole]
 		FROM
 			[User]
+			INNER JOIN [Role]
+				ON [User].[idRole] = [Role].[idRole]
 		WHERE
 			[User].[idUser] = @idUser
 

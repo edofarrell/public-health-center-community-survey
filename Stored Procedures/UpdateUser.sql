@@ -1,7 +1,8 @@
 ALTER PROCEDURE [UpdateUser]
 	@idUser [INT],
 	@newUsername [VARCHAR](20),
-	@newPassword [VARCHAR](20)
+	@newPassword [VARCHAR](20),
+	@newIdRole [INT]
 AS
 	DECLARE
 		@isSuccess [BIT]
@@ -12,7 +13,8 @@ AS
 			[User]
 		SET
 			[username] = @newUsername,
-			[password] = @newPassword
+			[password] = @newPassword,
+			[idRole] = @newIdRole
 		WHERE
 			[idUser] = @idUser
 
