@@ -10,10 +10,12 @@ AS
 			[User]
 		WHERE
 			[User].[idUser] = @idUser
+
 		COMMIT TRANSACTION
 	END TRY
 	BEGIN CATCH
 		SELECT
 			0
+
 		ROLLBACK TRANSACTION
 	END CATCH

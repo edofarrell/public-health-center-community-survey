@@ -11,10 +11,12 @@ AS
 			INNER JOIN [Role]
 		ON
 			[User].[idRole] = [Role].[idRole]
+
 		COMMIT TRANSACTION
 	END TRY
 	BEGIN CATCH
 		SELECT
 			0
+
 		ROLLBACK TRANSACTION
 	END CATCH

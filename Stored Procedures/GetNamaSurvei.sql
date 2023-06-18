@@ -9,10 +9,12 @@ AS
 			[Survei]
 		WHERE
 			[Survei].[idSurvei] = @idSurvei
+
 		COMMIT TRANSACTION
 	END TRY
 	BEGIN CATCH
 		SELECT
 			0
+
 		ROLLBACK TRANSACTION
 	END CATCH
