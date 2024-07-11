@@ -17,7 +17,7 @@ There are three roles and their features are as follows:
 ## Technologies
 SQL, MSSQL
 
-## Contributor
+## Contributors
 The project was completed by a team of three people:
 - Dearen Hippy (https://github.com/DearenHippy)
 - Edo Farrell Haryanto (https://github.com/edofarrell)
